@@ -7,6 +7,7 @@ import { renderAthletes } from "./views/athletes.js";
 import { renderTeams } from "./views/teams.js";
 import { renderReports } from "./views/reports.js";
 import { renderSettings } from "./views/settings.js";
+import { applySavedTheme, setupThemeToggle } from "./theme.js";
 
 const SCREEN_PATHS = {
   dashboard: "/screens/dashboard_für_trainer_innen/code.html",
@@ -30,12 +31,16 @@ const ROUTE_RENDERERS = {
 
 const root = document.getElementById("app-root");
 
+applySavedTheme();
+
 function highlightNavigation(container, route) {
   container.querySelectorAll("[data-route]").forEach((button) => {
     const isActive = button.dataset.route === route;
-    button.classList.toggle("bg-primary/20", isActive);
+    button.classList.toggle("bg-primary", isActive);
     button.classList.toggle("text-white", isActive);
-    button.classList.toggle("text-text-dark-secondary", !isActive);
+    button.classList.toggle("shadow-card", isActive);
+    button.classList.toggle("text-text-light-secondary", !isActive);
+    button.classList.toggle("dark:text-text-dark-secondary", !isActive);
     button.setAttribute("aria-current", isActive ? "page" : "false");
   });
 }
@@ -64,6 +69,8 @@ async function renderRoute(route) {
   const screenRoot = root.querySelector("[data-screen-root]") || root;
   setupNavigation(screenRoot);
   highlightNavigation(screenRoot, route);
+
+  setupThemeToggle(root);
 
   const contentRoot = root.querySelector("[data-screen-content]") || root;
   await render(contentRoot, { route });

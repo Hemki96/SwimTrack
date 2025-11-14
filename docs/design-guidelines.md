@@ -31,8 +31,10 @@ Alle Farben sind als Tailwind Utilities verfügbar (siehe `index.html` Tailwind-
 - **Abstände zwischen Sektionen:** `space-y-6` bzw. `gap-6` in Grids.
 
 ## Layoutprinzipien
-- **Navigation:** Linke Sidebar mit Buttons (`data-route`) in `flex`-Spalten. Aktive Route = `bg-primary/20` + `text-white`.
-- **Header:** Sticky (`h-20`, `border-b`) mit Titelblock links und Aktions-Buttons rechts.
+- **App-Shell:** Einheitliche Zweispaltenstruktur über alle Screens. Links eine feste Sidebar (`w-72`) mit `sticky top-0 h-screen overflow-y-auto`, rechts der Content-Bereich (`flex-1 overflow-y-auto`).
+- **Navigation:** In der Sidebar zwei Gruppen (`data-nav-primary`, `data-nav-secondary`). Buttons nutzen die gemeinsame Klasse `flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-text-light-secondary dark:text-text-dark-secondary hover:bg-primary/10 dark:hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary`. Aktive Route = `bg-primary text-white shadow-card`.
+- **Persistente Elemente:** Im unteren Navigationsblock befinden sich Theme-Toggle (`data-theme-toggle`), Link zu den Einstellungen und das User-Modul mit Avatar. Diese Elemente bleiben auf allen Seiten sichtbar.
+- **Header:** Sticky (`h-20`, `border-b`) mit Titelblock links und Aktions-Buttons rechts. Hintergrund `bg-background-light/80 dark:bg-background-dark/80`, `backdrop-blur-sm`.
 - **Grids:** Häufig `lg:grid-cols-[1.5fr_1fr]` oder `lg:grid-cols-3` für Karten-Layout.
 - **Kartenstruktur:**
   - Überschrift (`text-lg`, `font-semibold`), optional Untertitel in `text-sm`.
@@ -48,7 +50,7 @@ Alle Farben sind als Tailwind Utilities verfügbar (siehe `index.html` Tailwind-
 
 ## Responsives Verhalten
 - Karten stapeln sich mobil (`grid-cols-1`), ab `lg` mehrfach Spalten.
-- Sidebar bleibt fix (Breite `w-64`), Content scrollt innerhalb `main` (`overflow-y-auto`).
+- Sidebar bleibt fix (Breite `w-72`, `sticky top-0`), Content scrollt innerhalb `main` (`overflow-y-auto`).
 
 ## Komponentenübersicht
 - **Dashboard:** KPI-Grid (`md:grid-cols-2`, `xl:grid-cols-4`), Filterchips, Fortschrittsbalken (`h-3`, `rounded-full`).
@@ -59,8 +61,11 @@ Alle Farben sind als Tailwind Utilities verfügbar (siehe `index.html` Tailwind-
 - **Reports:** Tab-Navigation (`data-tab`), Reportkarten, Exportbereich mit Formular-Kacheln.
 - **Einstellungen:** Vier gleichgewichtete Karten (Benachrichtigungen, Datenschutz, Integrationen, Stammdaten) in einem `lg:grid-cols-2` Layout.
 
-## Dark Mode
-- `html` nutzt `class="dark"`. Alle Komponenten verwenden Tailwind `dark:`-Utilities. Neue Komponenten sollten für beide Modi angelegt werden.
+## Dark & Light Mode
+- `html` schaltet den Modus über `class="dark"` und `data-theme`. `body` erbt das aktive Theme (siehe `theme.js`).
+- Die Sidebar enthält einen Toggle (`[data-theme-toggle]`) für den Wechsel. Dieser muss pro Screen eingebunden sein und das aktuelle Theme widerspiegeln.
+- Alle Komponenten verwenden Tailwind `dark:`-Utilities. Neue Komponenten müssen Hell- und Dunkelmodus parallel berücksichtigen.
+- Theme-Persistenz erfolgt über `localStorage` (`swimtrack-theme`). Beim Initialisieren (`applySavedTheme`) muss der gespeicherte oder systemische Modus gesetzt werden.
 
 ## Asset- und Icon-Einsatz
 - Icons: Google Material Symbols Outlined (`<span class="material-symbols-outlined">name</span>`).
