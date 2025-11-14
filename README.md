@@ -42,7 +42,7 @@ SwimTrack/
 │   └── styles/            # Tailwind-Hilfsstyles & Assets
 ├── docs/design-guidelines.md # Design-Tokens, Layout- und Komponentenregeln
 ├── index.html             # Einstiegspunkt & Tailwind-Konfiguration
-├── render_start.sh        # Seed + Serverstart (für Render)
+├── render_start.sh        # Startskript für Render (setzt NODE_ENV, startet API)
 ├── render.yaml            # Render-Blueprint
 └── package.json
 ```
@@ -65,7 +65,7 @@ Die aus den HTML-Screens abgeleiteten Regeln sind in [`docs/design-guidelines.md
 Neue Screens sollten sich strikt an diese Tokens und Klassen halten, damit sie sich nahtlos in das gelieferte UI einfügen.
 
 ## Backend & Datenmodell
-Das Backend basiert auf Express.js mit einer SQLite-Datenbank (verwaltet durch `better-sqlite3`). Beim Start wird die Datenbank, falls notwendig, aus [`backend/schema.sql`](./backend/schema.sql) erstellt und mit Demo-Daten aus [`backend/seed_data.json`](./backend/seed_data.json) befüllt.
+Das Backend basiert auf Express.js mit einer SQLite-Datenbank (verwaltet durch `better-sqlite3`). Beim Start wird die Datenbank, falls notwendig, aus [`backend/schema.sql`](./backend/schema.sql) erstellt. Demo-Daten können über das CLI [`backend/seed.js`](./backend/seed.js) eingespielt werden, optional auch automatisiert per Umgebungsvariable (`SWIMTRACK_SEED_ON_START=1`).
 
 ### Tabellenübersicht
 - **teams** – Stammdaten, Level, Coach, Trainingstage, Fokus-Thema.
@@ -104,17 +104,20 @@ Statische Assets (`/index.html`, `/src`, `/screens`, `/docs`) werden ebenfalls �
    ```bash
    npm install
    ```
-3. **Demodaten initialisieren**
+3. **(Optional) Umgebungsvariablen konfigurieren**
+   - Kopiere `.env.example` nach `.env` und passe Werte wie `PORT`, `SWIMTRACK_DB_PATH` oder CORS-Whitelists (`SWIMTRACK_ALLOWED_ORIGINS`) an.
+   - Alternativ können die Variablen direkt in der Shell oder im Deployment gesetzt werden.
+4. **Demodaten initialisieren**
    ```bash
    npm run seed
    ```
    Standardpfad ist `./swimtrack.db`. Über `SWIMTRACK_DB_PATH` kann ein anderer Speicherort gesetzt werden.
-4. **Server starten**
+5. **Server starten**
    ```bash
    npm start
    ```
-   Der Server läuft auf `http://localhost:8000` und dient sowohl API als auch Frontend.
-5. **Entwicklung mit Auto-Reload**
+   Der Server läuft auf `http://localhost:8000` (konfigurierbar via `.env`) und dient sowohl API als auch Frontend.
+6. **Entwicklung mit Auto-Reload**
    ```bash
    npm run dev
    ```
@@ -130,10 +133,9 @@ Statische Assets (`/index.html`, `/src`, `/screens`, `/docs`) werden ebenfalls �
 ## Deployment (Render.com)
 1. Repository in Render als **Blueprint** importieren.
 2. Render erkennt `render.yaml`, installiert Abhängigkeiten und ruft `npm install` auf.
-3. Beim Start wird `render_start.sh` ausgeführt:
-   - Seeding (`node backend/seed.js --reset --silent`).
-   - Start des Express-Servers (`npm start`).
-4. Setze die Umgebungsvariable `SWIMTRACK_DB_PATH` auf ein beschreibbares Verzeichnis (z. B. `/tmp/swimtrack.db`) falls persistente Writes benötigt werden.
+3. Beim Start wird `render_start.sh` ausgeführt und startet den Server mit `NODE_ENV=production`.
+4. Setze die notwendigen Umgebungsvariablen (`PORT`, `SWIMTRACK_DB_PATH`, `SWIMTRACK_ALLOWED_ORIGINS`, …) direkt im Render-Dashboard oder per Blueprint-Secret.
+5. Falls Demodaten benötigt werden, kann vor dem ersten Start `npm run seed` ausgeführt oder `SWIMTRACK_SEED_ON_START=1` gesetzt werden (setzt vorhandene Daten nicht zurück).
 
 ## Tipps für Erweiterungen
 - **Neue Screens:** Lege die HTML-Datei im Ordner `screens/` ab und erweitere das `SCREEN_PATHS`-Mapping in `src/scripts/app.js`. Schreibe einen Renderer in `src/scripts/views/` und nutze vorhandene Utility-Klassen.

@@ -4,14 +4,42 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
+const config = require('./config');
+const { getDatabase, closeDatabase } = require('./db');
 const repositories = require('./repositories');
 const { seedDatabase } = require('./seed');
 
-seedDatabase({ onlyIfEmpty: true });
+try {
+  getDatabase();
+} catch (error) {
+  console.error('Database konnte nicht initialisiert werden.', error);
+  process.exit(1);
+}
+
+if (config.seed.onStart) {
+  try {
+    const result = seedDatabase({ onlyIfEmpty: config.seed.onlyIfEmpty });
+    if (!result.skipped) {
+      console.log(result.message);
+    }
+  } catch (error) {
+    console.error('Seed-Datenbankinitialisierung fehlgeschlagen.', error);
+    process.exit(1);
+  }
+}
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+if (config.trustProxy !== false) {
+  app.set('trust proxy', config.trustProxy);
+}
+app.disable('x-powered-by');
+
+const corsMiddleware =
+  config.cors.allowedOrigins && config.cors.allowedOrigins.length
+    ? cors({ origin: config.cors.allowedOrigins })
+    : cors();
+app.use(corsMiddleware);
+app.use(express.json({ limit: config.jsonBodyLimit }));
 
 const BASE_DIR = path.join(__dirname, '..');
 const STATIC_DIR = path.join(BASE_DIR, 'src');
@@ -659,7 +687,23 @@ app.use((req, res) => {
   res.status(404).json({ detail: 'Endpunkt nicht gefunden' });
 });
 
-const PORT = Number(process.env.PORT) || 8000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`SwimTrack API läuft auf Port ${PORT}`);
+const server = app.listen(config.port, config.host, () => {
+  console.log(`SwimTrack API läuft auf ${config.host}:${config.port}`);
+});
+
+function shutdown(signal) {
+  console.log(`Signal ${signal} empfangen – server fährt herunter.`);
+  server.close(() => {
+    closeDatabase();
+    console.log('HTTP-Server gestoppt. Beende Prozess.');
+    process.exit(0);
+  });
+  setTimeout(() => {
+    console.error('Erzwungener Shutdown nach Timeout.');
+    process.exit(1);
+  }, config.shutdown.timeoutMs).unref();
+}
+
+['SIGTERM', 'SIGINT'].forEach((signal) => {
+  process.on(signal, () => shutdown(signal));
 });
