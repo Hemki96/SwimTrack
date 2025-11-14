@@ -141,7 +141,7 @@ Statische Assets (`/index.html`, `/src`, `/screens`, `/docs`) werden ebenfalls �
 - **Neue Screens:** Lege die HTML-Datei im Ordner `screens/` ab und erweitere das `SCREEN_PATHS`-Mapping in `src/scripts/app.js`. Schreibe einen Renderer in `src/scripts/views/` und nutze vorhandene Utility-Klassen.
 - **Design-Konsistenz:** Halte dich an die Token aus `docs/design-guidelines.md` und nutze Material Symbols Icons über `<span class="material-symbols-outlined">`.
 - **API-Erweiterungen:** Implementiere Queries in `backend/repositories.js`, hänge Express-Routen in `backend/server.js` an und erweitere bei Bedarf die Seed-Daten.
-- **State-Invalidierung:** Nutze `invalidate(key)` oder spezialisierte Helper (z. B. `invalidateSessionsCache`) nach mutierenden Aktionen, damit das UI aktuelle Daten lädt.
+- **State-Invalidierung:** Sende nach mutierenden Aktionen gezielte Events wie `state.publish('sessions/updated')` und reagiere in Views über `state.subscribe(...)`, um nur die betroffenen Caches zu löschen.
 
 ## Fehlerbehebung
 | Problem | Hinweis |

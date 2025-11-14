@@ -1,6 +1,8 @@
 import { api } from "../api.js";
 import { getCached, setCached } from "../state.js";
 
+const METRICS_CACHE_TTL = 2 * 60 * 1000;
+
 function cacheKey(teamId, metricType) {
   return `metrics-${teamId || "all"}-${metricType || "all"}`;
 }
@@ -10,7 +12,7 @@ async function loadMetrics(teamId, metricType) {
   const cached = getCached(key);
   if (cached) return cached;
   const metrics = await api.getMetrics({ teamId, metricType });
-  return setCached(key, metrics);
+  return setCached(key, metrics, { ttl: METRICS_CACHE_TTL });
 }
 
 function renderTable(container, metrics, sortState, onSort) {
