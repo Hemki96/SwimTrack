@@ -1,4 +1,5 @@
 import { api } from "../api.js";
+import { publish } from "../state.js";
 import { primeTeamsCache } from "./dashboard.js";
 
 function renderTeamCards(container, teams) {
@@ -270,6 +271,7 @@ export async function renderTeams(root) {
     createButton.addEventListener("click", () => {
       teamFormDialog.open(async (payload) => {
         await api.createTeam(payload);
+        publish("teams/updated", { action: "create" });
         teamList = await api.getTeams();
         refreshTeamsDisplay();
       });
@@ -287,6 +289,7 @@ export async function renderTeams(root) {
             })
           )
         );
+        publish("teams/updated", { action: "update" });
         teamList = await api.getTeams();
         refreshTeamsDisplay();
       });

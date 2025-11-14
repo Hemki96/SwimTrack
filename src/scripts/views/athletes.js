@@ -1,6 +1,9 @@
 import { api } from "../api.js";
 import { getCached, setCached, invalidate } from "../state.js";
 
+const ATHLETE_LIST_TTL = 5 * 60 * 1000;
+const ATHLETE_DETAIL_TTL = 5 * 60 * 1000;
+
 function formatMetric(metric) {
   return `${metric.value} ${metric.unit}`;
 }
@@ -9,7 +12,7 @@ async function loadAthletes() {
   const cached = getCached("athletes-list");
   if (cached) return cached;
   const athletes = await api.getAthletes();
-  return setCached("athletes-list", athletes);
+  return setCached("athletes-list", athletes, { ttl: ATHLETE_LIST_TTL });
 }
 
 async function loadAthleteDetail(id) {
@@ -17,7 +20,7 @@ async function loadAthleteDetail(id) {
   const cached = getCached(key);
   if (cached) return cached;
   const detail = await api.getAthlete(id);
-  return setCached(key, detail);
+  return setCached(key, detail, { ttl: ATHLETE_DETAIL_TTL });
 }
 
 function createListItem(athlete) {

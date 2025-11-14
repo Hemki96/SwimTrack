@@ -1,6 +1,35 @@
 import { api } from "../api.js";
-import { getCached, setCached, invalidateMatching } from "../state.js";
-import { invalidateSessionsCache } from "./trainings.js";
+import {
+  getCached,
+  setCached,
+  invalidate,
+  invalidateMatching,
+  publish,
+  subscribe,
+} from "../state.js";
+
+const DASHBOARD_CACHE_PREFIX = "dashboard-data-";
+const DASHBOARD_CACHE_TTL = 5 * 60 * 1000;
+const TEAMS_CACHE_KEY = "teams-cache";
+const TEAMS_CACHE_TTL = 10 * 60 * 1000;
+
+let detachSessionsListener = null;
+let detachTeamsListener = null;
+
+function ensureDashboardSubscriptions() {
+  if (!detachSessionsListener) {
+    detachSessionsListener = subscribe("sessions/updated", () => {
+      invalidateDashboardCache();
+    });
+  }
+  if (!detachTeamsListener) {
+    detachTeamsListener = subscribe("teams/updated", () => {
+      invalidate(TEAMS_CACHE_KEY);
+    });
+  }
+}
+
+ensureDashboardSubscriptions();
 
 const KPI_CONFIG = [
   {
@@ -86,7 +115,7 @@ function buildAlertItems(data) {
 }
 
 async function loadDashboardData(range = 30) {
-  const cacheKey = `dashboard-data-${range}`;
+  const cacheKey = `${DASHBOARD_CACHE_PREFIX}${range}`;
   const cached = getCached(cacheKey);
   if (cached) return cached;
 
@@ -123,7 +152,7 @@ async function loadDashboardData(range = 30) {
         )
       ),
   };
-  return setCached(cacheKey, enriched);
+  return setCached(cacheKey, enriched, { ttl: DASHBOARD_CACHE_TTL });
 }
 
 function renderKpis(container, data) {
@@ -421,8 +450,7 @@ async function setupQuickCapture(root, refresh) {
     });
     dialog.close();
     form.reset();
-    invalidateSessionsCache();
-    invalidateDashboardCache();
+    publish("sessions/updated", { id: sessionId, action: "quick_capture" });
     await refresh();
   });
 }
@@ -635,9 +663,9 @@ export async function renderDashboard(root) {
 }
 
 export function primeTeamsCache(teams) {
-  setCached("teams-cache", teams);
+  setCached(TEAMS_CACHE_KEY, teams, { ttl: TEAMS_CACHE_TTL });
 }
 
 export function invalidateDashboardCache() {
-  invalidateMatching("dashboard-data-");
+  invalidateMatching(DASHBOARD_CACHE_PREFIX);
 }
