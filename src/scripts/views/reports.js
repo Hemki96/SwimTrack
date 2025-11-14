@@ -95,19 +95,31 @@ async function buildDataset(datasetId, filters) {
     case "attendance": {
       const sessions = await api.getSessions({ teamId: filters.teamId || undefined });
       const attendanceRows = [];
-      for (const session of sessions.slice(0, 10)) {
-        if (!withinRange(session.session_date, filters.from, filters.to)) continue;
-        const detail = await api.getSession(session.id);
+      const sessionsInRange = sessions.filter((session) =>
+        withinRange(session.session_date, filters.from, filters.to)
+      );
+      const sessionDetails = await Promise.all(
+        sessionsInRange.map(async (session) => {
+          const detail = await api.getSession(session.id);
+          return { session, detail };
+        })
+      );
+      sessionDetails.forEach(({ session, detail }) => {
         detail.attendance.forEach((entry) => {
+          const hasStatus = typeof entry.status === "string" && entry.status.trim().length > 0;
+          const hasNote = typeof entry.note === "string" && entry.note.trim().length > 0;
+          if (!hasStatus && !hasNote) {
+            return;
+          }
           attendanceRows.push([
             session.session_date,
             session.title,
             `${entry.first_name} ${entry.last_name}`,
-            entry.status,
-            entry.note || "—",
+            hasStatus ? entry.status : "—",
+            hasNote ? entry.note : "—",
           ]);
         });
-      }
+      });
       return {
         header: ["Datum", "Einheit", "Athlet:in", "Status", "Notiz"],
         rows: attendanceRows,
@@ -134,7 +146,8 @@ async function buildDataset(datasetId, filters) {
 
 function downloadData(dataset, format) {
   if (!dataset.rows.length) return;
-  if (format === "json") {
+  const normalizedFormat = format === "xlsx" ? "csv" : format;
+  if (normalizedFormat === "json") {
     const blob = new Blob([JSON.stringify(dataset.rows, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -149,7 +162,7 @@ function downloadData(dataset, format) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = format === "xlsx" ? "swimtrack-export.xlsx" : "swimtrack-export.csv";
+  link.download = "swimtrack-export.csv";
   link.click();
   URL.revokeObjectURL(url);
 }
@@ -193,6 +206,14 @@ async function setupExportSection(container) {
   const historyContainer = container.querySelector("#export-history");
   const exportButton = container.querySelector('[data-action="export-start"]');
   const refreshButton = container.querySelector('[data-action="refresh-exports"]');
+  const formatSelect = container.querySelector("#export-format");
+
+  if (formatSelect) {
+    const excelOption = formatSelect.querySelector('option[value="xlsx"]');
+    if (excelOption) {
+      excelOption.remove();
+    }
+  }
 
   renderDatasetOptions(datasetsContainer);
 
@@ -209,7 +230,8 @@ async function setupExportSection(container) {
     const form = container.querySelector("#export-form");
     const formData = new FormData(form);
     const datasetId = formData.get("dataset") || DATASET_CATALOG[0].id;
-    const format = formData.get("format") || "csv";
+    const requestedFormat = formData.get("format") || "csv";
+    const format = requestedFormat === "xlsx" ? "csv" : requestedFormat;
     const filters = {
       teamId: formData.get("team") === "all" ? null : Number(formData.get("team")),
       from: formData.get("from"),
