@@ -92,7 +92,7 @@ async function loadDashboardData(range = 30) {
 
   const [dashboard, sessions] = await Promise.all([
     api.getDashboard({ range }),
-    api.getSessions(),
+    api.getSessions({ includeAttendance: true }),
   ]);
   const effectiveRange = dashboard?.range_days ?? range;
   const now = new Date();
@@ -107,18 +107,14 @@ async function loadDashboardData(range = 30) {
     }
     return sessionDate >= start && sessionDate <= now;
   });
-  const attendanceDetails = await Promise.all(
-    sessionsInRange.map((session) => api.getSession(session.id))
-  );
-
   const enriched = {
     dashboard,
     sessions,
     sessions_in_range: sessionsInRange,
-    attendance: attendanceDetails
-      .map((entry) => ({
-        session: entry.session,
-        attendance: entry.attendance,
+    attendance: sessionsInRange
+      .map((session) => ({
+        session,
+        attendance: Array.isArray(session.attendance) ? session.attendance : [],
       }))
       .filter((entry) =>
         Array.isArray(entry.attendance) &&

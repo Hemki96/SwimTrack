@@ -39,10 +39,20 @@ export const api = {
   getAthlete(id) {
     return request(`/athletes/${id}`);
   },
+  /**
+   * Fetch training sessions.
+   *
+   * @param {Object} [filters]
+   * @param {number} [filters.teamId] Limit to a specific team.
+   * @param {string} [filters.status] Limit to a specific session status.
+   * @param {boolean} [filters.includeAttendance] When true, each session includes an `attendance` array
+   *   with `{ id, first_name, last_name, status, note }` entries for the team's athletes.
+   */
   getSessions(filters = {}) {
     const params = new URLSearchParams();
     if (filters.teamId) params.set("team_id", filters.teamId);
     if (filters.status) params.set("status", filters.status);
+    if (filters.includeAttendance) params.set("with_attendance", "1");
     const query = params.toString();
     return request(`/sessions${query ? `?${query}` : ""}`);
   },

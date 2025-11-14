@@ -286,6 +286,10 @@ app.get('/sessions', (req, res) => {
     if (req.query.status !== undefined) {
       filters.status = req.query.status;
     }
+    if (req.query.with_attendance !== undefined) {
+      const flag = String(req.query.with_attendance).toLowerCase();
+      filters.includeAttendance = flag !== '0' && flag !== 'false' && flag !== 'no';
+    }
     res.json(repositories.fetchSessions(filters));
   } catch (error) {
     res.status(500).json({ detail: 'Sessions konnten nicht geladen werden', error: error.message });
