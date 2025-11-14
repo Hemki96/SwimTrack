@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { getCached, setCached, invalidate } from "../state.js";
+import { getCached, setCached, invalidateMatching } from "../state.js";
 import { invalidateSessionsCache } from "./trainings.js";
 
 const KPI_CONFIG = [
@@ -80,12 +80,29 @@ function buildAlertItems(data) {
   return alerts;
 }
 
-async function loadDashboardData() {
-  const cached = getCached("dashboard-data");
+async function loadDashboardData(range = 30) {
+  const cacheKey = `dashboard-data-${range}`;
+  const cached = getCached(cacheKey);
   if (cached) return cached;
 
-  const [dashboard, sessions] = await Promise.all([api.getDashboard(), api.getSessions()]);
-  const recentSessions = sessions.slice(0, 8);
+  const [dashboard, sessions] = await Promise.all([
+    api.getDashboard({ range }),
+    api.getSessions(),
+  ]);
+  const effectiveRange = dashboard?.range_days ?? range;
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const start = new Date(now);
+  start.setDate(start.getDate() - Math.max(0, effectiveRange - 1));
+  const sessionsInRange = sessions.filter((session) => {
+    if (!session.session_date) return false;
+    const sessionDate = new Date(`${session.session_date}T00:00:00`);
+    if (Number.isNaN(sessionDate.getTime())) {
+      return false;
+    }
+    return sessionDate >= start && sessionDate <= now;
+  });
+  const recentSessions = sessionsInRange.slice(0, 8);
   const attendanceDetails = await Promise.all(
     recentSessions.map((session) => api.getSession(session.id))
   );
@@ -93,12 +110,13 @@ async function loadDashboardData() {
   const enriched = {
     dashboard,
     sessions,
+    sessions_in_range: sessionsInRange,
     attendance: attendanceDetails.map((entry) => ({
       session: entry.session,
       attendance: entry.attendance,
     })),
   };
-  return setCached("dashboard-data", enriched);
+  return setCached(cacheKey, enriched);
 }
 
 function renderKpis(container, data) {
@@ -197,6 +215,11 @@ function renderLoadChart(container, dashboard) {
 }
 
 function renderAttendance(container, attendance) {
+  if (!attendance.length) {
+    container.innerHTML =
+      '<p class="rounded-lg border border-border-light bg-background-light p-4 text-sm text-text-light-secondary dark:border-border-dark dark:bg-background-dark dark:text-text-dark-secondary">Keine Anwesenheitsdaten im gewählten Zeitraum.</p>';
+    return;
+  }
   container.innerHTML = attendance
     .map(({ session, attendance: entries }) => {
       const total = entries.length || 1;
@@ -240,6 +263,81 @@ function renderActivity(container, activities) {
     `;
     container.appendChild(entry);
   });
+}
+
+function createActivityLogController(root) {
+  let dialog;
+  let list;
+  let currentActivities = [];
+
+  function ensureDialog() {
+    if (dialog && root.contains(dialog)) {
+      return dialog;
+    }
+    dialog = document.createElement("dialog");
+    dialog.id = "dashboard-activity-log";
+    dialog.className =
+      "dialog fixed inset-0 h-fit w-full max-w-2xl rounded-2xl border border-border-light bg-card-light/95 p-0 text-left shadow-card backdrop:bg-black/50 backdrop:backdrop-blur dark:border-border-dark dark:bg-card-dark/95";
+    dialog.innerHTML = `
+      <form method="dialog" class="flex flex-col gap-6 p-6">
+        <header class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold leading-tight">Aktivitätsverlauf</h2>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Letzte Updates aus Trainings &amp; Messungen</p>
+          </div>
+          <button type="button" class="size-10 rounded-full bg-card-light text-text-light-secondary transition hover:bg-zinc-100 dark:bg-card-dark dark:text-text-dark-secondary dark:hover:bg-[#2a3f53]" data-action="close-activity-log">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div id="activity-log-list" class="max-h-[24rem] overflow-y-auto space-y-3"></div>
+        <footer class="flex items-center justify-end">
+          <button type="button" data-action="close-activity-log" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90">Schließen</button>
+        </footer>
+      </form>
+    `;
+    root.appendChild(dialog);
+    list = dialog.querySelector("#activity-log-list");
+    dialog.querySelectorAll('[data-action="close-activity-log"]').forEach((button) =>
+      button.addEventListener("click", () => dialog.close())
+    );
+    return dialog;
+  }
+
+  function renderList() {
+    if (!list) return;
+    if (!currentActivities.length) {
+      list.innerHTML =
+        '<p class="rounded-xl border border-border-light bg-background-light p-4 text-sm text-text-light-secondary dark:border-border-dark dark:bg-background-dark dark:text-text-dark-secondary">Keine Aktivitäten im gewählten Zeitraum.</p>';
+      return;
+    }
+    list.innerHTML = currentActivities
+      .map(
+        (activity) => `
+          <article class="rounded-xl border border-border-light bg-background-light px-4 py-3 text-sm shadow-sm dark:border-border-dark dark:bg-background-dark">
+            <div class="flex items-center justify-between">
+              <p class="font-semibold text-text-light-primary dark:text-text-dark-primary">${activity.title}</p>
+              <span class="text-xs text-text-light-secondary dark:text-text-dark-secondary">${formatDate(activity.date)}</span>
+            </div>
+            <p class="mt-1 text-xs text-text-light-secondary dark:text-text-dark-secondary">${activity.status}</p>
+          </article>
+        `
+      )
+      .join("");
+  }
+
+  return {
+    setActivities(activities = []) {
+      currentActivities = Array.isArray(activities) ? activities : [];
+      if (list) {
+        renderList();
+      }
+    },
+    open() {
+      const dlg = ensureDialog();
+      renderList();
+      dlg.showModal();
+    },
+  };
 }
 
 function filterSessions(sessions, filters) {
@@ -385,6 +483,33 @@ export async function renderDashboard(root) {
   const noteForm = root.querySelector("#coach-note-form");
   const noteFeedback = root.querySelector("#coach-note-feedback");
   const noteField = root.querySelector("#coach-note-field");
+  const timeframeButtons = Array.from(root.querySelectorAll('[data-timeframe]'));
+  const kpiDescription = root.querySelector('[data-element="kpi-description"]');
+  const refreshAlertsButton = root.querySelector('[data-action="refresh-alerts"]');
+  const activityTrigger = root.querySelector('[data-action="open-activity-log"]');
+  const activityLog = createActivityLogController(root);
+
+  let filterController;
+  let currentRange = Number(
+    timeframeButtons.find((button) => button.classList.contains("bg-primary"))?.dataset.timeframe
+  );
+  if (!Number.isFinite(currentRange)) {
+    currentRange = 30;
+  }
+
+  function updateTimeframeButtons(range) {
+    timeframeButtons.forEach((button) => {
+      const value = Number(button.dataset.timeframe);
+      const isActive = value === range;
+      button.classList.toggle("bg-primary", isActive);
+      button.classList.toggle("text-white", isActive);
+      button.classList.toggle("shadow-card", isActive);
+      button.classList.toggle("bg-primary/10", !isActive);
+      button.classList.toggle("text-primary", !isActive);
+      button.classList.toggle("font-semibold", isActive);
+      button.classList.toggle("font-medium", !isActive);
+    });
+  }
 
   function applyData(data) {
     renderKpis(kpiContainer, data.dashboard);
@@ -394,12 +519,78 @@ export async function renderDashboard(root) {
     renderActivity(activityContainer, data.dashboard.activities || []);
     renderAlerts(alertsContainer, data);
     renderCoachNoteSection(root, data.dashboard);
+    activityLog.setActivities(data.dashboard.activities || []);
+    if (kpiDescription) {
+      const range = data.dashboard.range_days ?? currentRange;
+      kpiDescription.textContent = `Kennzahlen der letzten ${range} Tage`;
+    }
   }
 
-  const data = await loadDashboardData();
+  async function refreshDashboard({ range = currentRange, invalidateCache = false } = {}) {
+    if (invalidateCache) {
+      invalidateDashboardCache();
+    }
+    const refreshed = await loadDashboardData(range);
+    currentRange = refreshed.dashboard.range_days ?? range;
+    updateTimeframeButtons(currentRange);
+    applyData(refreshed);
+    if (filterController) {
+      filterController.updateData(refreshed);
+    }
+    return refreshed;
+  }
+
   refreshHeading(root);
+  const data = await loadDashboardData(currentRange);
+  currentRange = data.dashboard.range_days ?? currentRange;
+  updateTimeframeButtons(currentRange);
   applyData(data);
-  const filterController = await setupFilters(root, data);
+  filterController = await setupFilters(root, data);
+
+  timeframeButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      const range = Number(button.dataset.timeframe);
+      if (!Number.isFinite(range)) {
+        return;
+      }
+      try {
+        if (range === currentRange) {
+          await refreshDashboard({ invalidateCache: true });
+        } else {
+          await refreshDashboard({ range });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  });
+
+  if (refreshAlertsButton) {
+    refreshAlertsButton.addEventListener("click", async () => {
+      const originalText = refreshAlertsButton.textContent;
+      refreshAlertsButton.disabled = true;
+      refreshAlertsButton.textContent = "Aktualisiert...";
+      try {
+        await refreshDashboard({ invalidateCache: true });
+        refreshAlertsButton.textContent = "Aktualisiert";
+        setTimeout(() => {
+          refreshAlertsButton.textContent = originalText;
+        }, 2000);
+      } catch (error) {
+        console.error(error);
+        refreshAlertsButton.textContent = "Fehler";
+        setTimeout(() => {
+          refreshAlertsButton.textContent = originalText;
+        }, 2000);
+      } finally {
+        refreshAlertsButton.disabled = false;
+      }
+    });
+  }
+
+  if (activityTrigger) {
+    activityTrigger.addEventListener("click", () => activityLog.open());
+  }
 
   if (noteForm && noteField && noteFeedback) {
     noteForm.addEventListener("submit", async (event) => {
@@ -414,10 +605,7 @@ export async function renderDashboard(root) {
         await api.saveNote(noteText);
         noteFeedback.textContent = "Notiz gespeichert.";
         noteFeedback.className = "text-xs text-success";
-        invalidateDashboardCache();
-        const refreshed = await loadDashboardData();
-        applyData(refreshed);
-        filterController.updateData(refreshed);
+        await refreshDashboard({ invalidateCache: true });
       } catch (error) {
         console.error(error);
         noteFeedback.textContent = "Speichern fehlgeschlagen.";
@@ -430,12 +618,7 @@ export async function renderDashboard(root) {
     });
   }
 
-  await setupQuickCapture(root, async () => {
-    invalidateDashboardCache();
-    const refreshed = await loadDashboardData();
-    applyData(refreshed);
-    filterController.updateData(refreshed);
-  });
+  await setupQuickCapture(root, () => refreshDashboard({ invalidateCache: true }));
 }
 
 export function primeTeamsCache(teams) {
@@ -443,5 +626,5 @@ export function primeTeamsCache(teams) {
 }
 
 export function invalidateDashboardCache() {
-  invalidate("dashboard-data");
+  invalidateMatching("dashboard-data-");
 }

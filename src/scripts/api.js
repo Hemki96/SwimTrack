@@ -19,8 +19,13 @@ async function request(path, options = {}) {
 }
 
 export const api = {
-  getDashboard() {
-    return request("/dashboard");
+  getDashboard(options = {}) {
+    const params = new URLSearchParams();
+    if (options.range) {
+      params.set("range", options.range);
+    }
+    const query = params.toString();
+    return request(`/dashboard${query ? `?${query}` : ""}`);
   },
   getTeams() {
     return request("/teams");
@@ -50,6 +55,18 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  createSession(payload) {
+    return request("/sessions", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  duplicateSession(id, payload) {
+    return request(`/sessions/${id}/duplicate`, {
+      method: "POST",
+      body: JSON.stringify(payload || {}),
+    });
+  },
   saveAttendance(id, entries) {
     return request(`/sessions/${id}/attendance`, {
       method: "POST",
@@ -70,6 +87,18 @@ export const api = {
     return request("/notes", {
       method: "POST",
       body: JSON.stringify({ body }),
+    });
+  },
+  createTeam(payload) {
+    return request("/teams", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  updateTeam(id, payload) {
+    return request(`/teams/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
     });
   },
 };

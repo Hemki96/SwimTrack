@@ -39,7 +39,13 @@ app.get('/', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
   try {
-    const payload = repositories.fetchDashboardKpis();
+    const rangeParam = req.query.range;
+    const rangeDays = rangeParam !== undefined ? Number(rangeParam) : undefined;
+    if (rangeParam !== undefined && (Number.isNaN(rangeDays) || rangeDays <= 0)) {
+      res.status(400).json({ detail: 'range muss eine positive Zahl sein' });
+      return;
+    }
+    const payload = repositories.fetchDashboardKpis({ rangeDays });
     const note = repositories.fetchLatestNote();
     if (note) {
       payload.coach_note = note;
@@ -138,6 +144,56 @@ app.patch('/sessions/:sessionId', (req, res) => {
   }
 });
 
+app.post('/sessions', (req, res) => {
+  try {
+    const {
+      team_id,
+      title,
+      session_date,
+      start_time,
+      duration_minutes,
+      status,
+      focus_area,
+      load_target,
+      load_actual,
+      notes,
+    } = req.body || {};
+    const required = [team_id, title, session_date, start_time, duration_minutes, status, focus_area, load_target];
+    if (required.some((value) => value === undefined || value === null || value === '')) {
+      res.status(400).json({ detail: 'Pflichtfelder fehlen für die Erstellung der Einheit' });
+      return;
+    }
+    const created = repositories.createSession({
+      team_id,
+      title,
+      session_date,
+      start_time,
+      duration_minutes,
+      status,
+      focus_area,
+      load_target,
+      load_actual,
+      notes,
+    });
+    res.status(201).json(created);
+  } catch (error) {
+    res.status(500).json({ detail: 'Trainingseinheit konnte nicht angelegt werden', error: error.message });
+  }
+});
+
+app.post('/sessions/:sessionId/duplicate', (req, res) => {
+  try {
+    const duplicated = repositories.duplicateSession(Number(req.params.sessionId), req.body || {});
+    if (!duplicated) {
+      res.status(404).json({ detail: 'Ausgangseinheit nicht gefunden' });
+      return;
+    }
+    res.status(201).json(duplicated);
+  } catch (error) {
+    res.status(500).json({ detail: 'Trainingseinheit konnte nicht dupliziert werden', error: error.message });
+  }
+});
+
 app.post('/sessions/:sessionId/attendance', (req, res) => {
   try {
     const entries = Array.isArray(req.body) ? req.body : [];
@@ -196,6 +252,41 @@ app.get('/metrics', (req, res) => {
     res.json(repositories.fetchMetrics(filters));
   } catch (error) {
     res.status(500).json({ detail: 'Metriken konnten nicht geladen werden', error: error.message });
+  }
+});
+
+app.post('/teams', (req, res) => {
+  try {
+    const { name, short_name, level, coach, training_days, focus_theme } = req.body || {};
+    const required = [name, short_name, level, coach, training_days, focus_theme];
+    if (required.some((value) => value === undefined || value === null || value === '')) {
+      res.status(400).json({ detail: 'Pflichtfelder fehlen für die Erstellung des Teams' });
+      return;
+    }
+    const team = repositories.createTeam({
+      name,
+      short_name,
+      level,
+      coach,
+      training_days,
+      focus_theme,
+    });
+    res.status(201).json(team);
+  } catch (error) {
+    res.status(500).json({ detail: 'Team konnte nicht erstellt werden', error: error.message });
+  }
+});
+
+app.patch('/teams/:teamId', (req, res) => {
+  try {
+    const updated = repositories.updateTeam(Number(req.params.teamId), req.body || {});
+    if (!updated) {
+      res.status(404).json({ detail: 'Team nicht gefunden' });
+      return;
+    }
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ detail: 'Team konnte nicht aktualisiert werden', error: error.message });
   }
 });
 

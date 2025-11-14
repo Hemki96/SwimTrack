@@ -264,6 +264,8 @@ function setupTabs(root, exportLoader) {
   });
 
   switchTab("overview");
+
+  return switchTab;
 }
 
 export async function renderReports(root) {
@@ -271,11 +273,233 @@ export async function renderReports(root) {
   const scheduled = root.querySelector("#scheduled-reports");
   const exportContainer = root.querySelector("#reports-export");
   const reports = await api.getReports();
+  const teams = await api.getTeams();
 
-  renderReportBuilder(builder, reports);
-  renderScheduledReports(scheduled, reports);
+  let overviewReports = [...reports];
+  let scheduledReports = [...reports];
 
-  setupTabs(root, async () => {
+  renderReportBuilder(builder, overviewReports);
+  renderScheduledReports(scheduled, scheduledReports);
+
+  const switchTab = setupTabs(root, async () => {
     await setupExportSection(exportContainer);
   });
+
+  const openExportButton = root.querySelector('[data-action="open-export"]');
+  const createReportButton = root.querySelector('[data-action="create-report"]');
+  const scheduleReportButton = root.querySelector('[data-action="schedule-report"]');
+
+  if (openExportButton) {
+    openExportButton.addEventListener("click", () => {
+      switchTab("export");
+      const exportStart = exportContainer.querySelector('[data-action="export-start"]');
+      if (exportStart) {
+        exportStart.focus();
+      }
+    });
+  }
+
+  let createDialog;
+  function ensureCreateDialog() {
+    if (createDialog && root.contains(createDialog)) {
+      return createDialog;
+    }
+    createDialog = document.createElement("dialog");
+    createDialog.id = "report-create-dialog";
+    createDialog.className =
+      "dialog fixed inset-0 h-fit w-full max-w-lg rounded-2xl border border-border-light bg-card-light/95 p-0 text-left shadow-card backdrop:bg-black/50 backdrop:backdrop-blur dark:border-border-dark dark:bg-card-dark/95";
+    createDialog.innerHTML = `
+      <form id="report-create-form" class="flex flex-col gap-6 p-6">
+        <header class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold leading-tight">Report erstellen</h2>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Titel und Zeitraum definieren</p>
+          </div>
+          <button type="button" class="size-10 rounded-full bg-card-light text-text-light-secondary transition hover:bg-zinc-100 dark:bg-card-dark dark:text-text-dark-secondary dark:hover:bg-[#2a3f53]" data-action="close-report-dialog">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div class="grid gap-4">
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Titel</span>
+            <input name="title" type="text" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" placeholder="z. B. Q1 Teamreport" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Team</span>
+            <select name="team_id" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark"></select>
+          </label>
+          <div class="grid gap-4 md:grid-cols-2">
+            <label class="flex flex-col gap-2 text-sm">
+              <span>Von</span>
+              <input name="from" type="date" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+            </label>
+            <label class="flex flex-col gap-2 text-sm">
+              <span>Bis</span>
+              <input name="to" type="date" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+            </label>
+          </div>
+        </div>
+        <p id="report-create-feedback" class="text-xs text-text-light-secondary dark:text-text-dark-secondary"></p>
+        <footer class="flex items-center justify-end gap-3">
+          <button type="button" data-action="close-report-dialog" class="rounded-lg px-4 py-2 text-sm font-medium text-text-light-secondary transition hover:bg-zinc-100 dark:text-text-dark-secondary dark:hover:bg-[#2a3f53]">Abbrechen</button>
+          <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90">Report anlegen</button>
+        </footer>
+      </form>
+    `;
+    root.appendChild(createDialog);
+    const form = createDialog.querySelector("#report-create-form");
+    const select = form.querySelector('select[name="team_id"]');
+    teams.forEach((team) => {
+      const option = document.createElement("option");
+      option.value = String(team.id);
+      option.textContent = team.name;
+      select.appendChild(option);
+    });
+    const feedback = form.querySelector("#report-create-feedback");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const titleValue = String(formData.get("title") || "").trim();
+      const teamId = Number(formData.get("team_id"));
+      const from = formData.get("from");
+      const to = formData.get("to");
+      if (!titleValue || !teamId || !from || !to) {
+        feedback.textContent = "Bitte alle Felder ausfüllen.";
+        feedback.className = "text-xs text-danger";
+        return;
+      }
+      const team = teams.find((item) => item.id === teamId);
+      overviewReports = [
+        {
+          id: Date.now(),
+          title: titleValue,
+          team_name: team?.name || "Team", 
+          period_start: from,
+          period_end: to,
+          status: "Entwurf",
+        },
+        ...overviewReports,
+      ];
+      renderReportBuilder(builder, overviewReports);
+      feedback.textContent = "Report angelegt.";
+      feedback.className = "text-xs text-success";
+      setTimeout(() => {
+        feedback.textContent = "";
+        feedback.className = "text-xs text-text-light-secondary dark:text-text-dark-secondary";
+        form.reset();
+        createDialog.close();
+      }, 800);
+    });
+    createDialog.querySelectorAll('[data-action="close-report-dialog"]').forEach((button) =>
+      button.addEventListener("click", () => createDialog.close())
+    );
+    return createDialog;
+  }
+
+  let scheduleDialog;
+  function ensureScheduleDialog() {
+    if (scheduleDialog && root.contains(scheduleDialog)) {
+      return scheduleDialog;
+    }
+    scheduleDialog = document.createElement("dialog");
+    scheduleDialog.id = "report-schedule-dialog";
+    scheduleDialog.className =
+      "dialog fixed inset-0 h-fit w-full max-w-lg rounded-2xl border border-border-light bg-card-light/95 p-0 text-left shadow-card backdrop:bg-black/50 backdrop:backdrop-blur dark:border-border-dark dark:bg-card-dark/95";
+    scheduleDialog.innerHTML = `
+      <form id="report-schedule-form" class="flex flex-col gap-6 p-6">
+        <header class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold leading-tight">Report planen</h2>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Automatische Versandfrequenz festlegen</p>
+          </div>
+          <button type="button" class="size-10 rounded-full bg-card-light text-text-light-secondary transition hover:bg-zinc-100 dark:bg-card-dark dark:text-text-dark-secondary dark:hover:bg-[#2a3f53]" data-action="close-schedule-dialog">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div class="grid gap-4">
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Team</span>
+            <select name="team_id" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark"></select>
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Startdatum</span>
+            <input name="start" type="date" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Frequenz</span>
+            <select name="frequency" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark">
+              <option value="wöchentlich">Wöchentlich</option>
+              <option value="monatlich">Monatlich</option>
+              <option value="quartalsweise">Quartalsweise</option>
+            </select>
+          </label>
+        </div>
+        <p id="report-schedule-feedback" class="text-xs text-text-light-secondary dark:text-text-dark-secondary"></p>
+        <footer class="flex items-center justify-end gap-3">
+          <button type="button" data-action="close-schedule-dialog" class="rounded-lg px-4 py-2 text-sm font-medium text-text-light-secondary transition hover:bg-zinc-100 dark:text-text-dark-secondary dark:hover:bg-[#2a3f53]">Abbrechen</button>
+          <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90">Planung speichern</button>
+        </footer>
+      </form>
+    `;
+    root.appendChild(scheduleDialog);
+    const form = scheduleDialog.querySelector("#report-schedule-form");
+    const select = form.querySelector('select[name="team_id"]');
+    teams.forEach((team) => {
+      const option = document.createElement("option");
+      option.value = String(team.id);
+      option.textContent = team.name;
+      select.appendChild(option);
+    });
+    const feedback = form.querySelector("#report-schedule-feedback");
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const teamId = Number(formData.get("team_id"));
+      const start = formData.get("start");
+      const frequency = String(formData.get("frequency") || "wöchentlich");
+      if (!teamId || !start) {
+        feedback.textContent = "Bitte Team und Startdatum wählen.";
+        feedback.className = "text-xs text-danger";
+        return;
+      }
+      const team = teams.find((item) => item.id === teamId);
+      scheduledReports = [
+        {
+          id: Date.now(),
+          title: `${team?.name || "Team"} ${frequency}`,
+          team_name: team?.name || "Team",
+          status: `Geplant (${frequency})`,
+          delivered_on: start,
+        },
+        ...scheduledReports,
+      ];
+      renderScheduledReports(scheduled, scheduledReports);
+      feedback.textContent = "Planung gespeichert.";
+      feedback.className = "text-xs text-success";
+      setTimeout(() => {
+        feedback.textContent = "";
+        feedback.className = "text-xs text-text-light-secondary dark:text-text-dark-secondary";
+        form.reset();
+        scheduleDialog.close();
+      }, 800);
+    });
+    scheduleDialog.querySelectorAll('[data-action="close-schedule-dialog"]').forEach((button) =>
+      button.addEventListener("click", () => scheduleDialog.close())
+    );
+    return scheduleDialog;
+  }
+
+  if (createReportButton) {
+    createReportButton.addEventListener("click", () => {
+      const dialog = ensureCreateDialog();
+      dialog.showModal();
+    });
+  }
+
+  if (scheduleReportButton) {
+    scheduleReportButton.addEventListener("click", () => {
+      const dialog = ensureScheduleDialog();
+      dialog.showModal();
+    });
+  }
 }

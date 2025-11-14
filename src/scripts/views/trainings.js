@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { getCached, setCached, invalidate } from "../state.js";
+import { getCached, setCached, invalidate, invalidateMatching } from "../state.js";
 
 const STATUS_LABELS = {
   geplant: "Geplant",
@@ -36,27 +36,336 @@ function sessionStatusTone(status) {
   return tones[status] || "bg-card-light text-text-light-secondary dark:bg-card-dark dark:text-text-dark-secondary";
 }
 
-function renderSessionCards(container, sessions) {
+function createSessionButton(session) {
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className =
+    "group w-full rounded-xl border border-border-light bg-card-light p-4 text-left transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card dark:border-border-dark dark:bg-card-dark";
+  card.dataset.sessionId = session.id;
+  card.innerHTML = `
+    <div class="flex items-center justify-between">
+      <p class="text-base font-semibold text-text-light-primary dark:text-text-dark-primary">${session.title}</p>
+      <span class="rounded-full px-3 py-1 text-xs font-medium ${sessionStatusTone(session.status)}">${STATUS_LABELS[session.status] || session.status}</span>
+    </div>
+    <p class="mt-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">${formatDateTime(session.session_date, session.start_time)}</p>
+    <p class="text-xs text-text-light-secondary dark:text-text-dark-secondary">${session.team_name}</p>
+  `;
+  return card;
+}
+
+function renderSessionCards(container, sessions, view = "list") {
   container.innerHTML = "";
   if (!sessions.length) {
-    container.innerHTML = '<p class="rounded-xl border border-border-light bg-background-light p-4 text-sm text-text-light-secondary dark:border-border-dark dark:bg-background-dark dark:text-text-dark-secondary">Keine Trainingseinheiten gefunden.</p>';
+    container.innerHTML =
+      '<p class="rounded-xl border border-border-light bg-background-light p-4 text-sm text-text-light-secondary dark:border-border-dark dark:bg-background-dark dark:text-text-dark-secondary">Keine Trainingseinheiten gefunden.</p>';
     return;
   }
+
+  if (view === "board") {
+    const board = document.createElement("div");
+    board.className = "grid gap-4 md:grid-cols-3";
+    const columns = [
+      { key: "geplant", label: "Geplant" },
+      { key: "gestartet", label: "Gestartet" },
+      { key: "abgeschlossen", label: "Abgeschlossen" },
+    ];
+    columns.forEach((column) => {
+      const wrapper = document.createElement("section");
+      wrapper.className = "flex flex-col gap-3 rounded-xl border border-border-light bg-background-light p-4 dark:border-border-dark dark:bg-background-dark";
+      wrapper.innerHTML = `
+        <header class="flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-text-light-primary dark:text-text-dark-primary">${column.label}</h3>
+          <span class="rounded-full bg-card-light px-3 py-1 text-xs text-text-light-secondary dark:bg-card-dark dark:text-text-dark-secondary">${sessions.filter((item) => item.status === column.key).length}</span>
+        </header>
+        <div class="space-y-3" data-column="${column.key}"></div>
+      `;
+      board.appendChild(wrapper);
+    });
+    sessions.forEach((session) => {
+      const target = board.querySelector(`[data-column="${session.status}"]`);
+      if (target) {
+        target.appendChild(createSessionButton(session));
+      }
+    });
+    container.appendChild(board);
+    return;
+  }
+
   sessions.forEach((session) => {
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "group w-full rounded-xl border border-border-light bg-card-light p-4 text-left transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card dark:border-border-dark dark:bg-card-dark";
-    card.dataset.sessionId = session.id;
-    card.innerHTML = `
-      <div class="flex items-center justify-between">
-        <p class="text-base font-semibold text-text-light-primary dark:text-text-dark-primary">${session.title}</p>
-        <span class="rounded-full px-3 py-1 text-xs font-medium ${sessionStatusTone(session.status)}">${STATUS_LABELS[session.status] || session.status}</span>
-      </div>
-      <p class="mt-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">${formatDateTime(session.session_date, session.start_time)}</p>
-      <p class="text-xs text-text-light-secondary dark:text-text-dark-secondary">${session.team_name}</p>
-    `;
-    container.appendChild(card);
+    container.appendChild(createSessionButton(session));
   });
+}
+
+function createSessionDialog(root, teams) {
+  let dialog;
+  let form;
+  let submit;
+  let feedback;
+  let title;
+  let currentHandler = null;
+
+  function ensureDialog() {
+    if (dialog && root.contains(dialog)) {
+      return dialog;
+    }
+    dialog = document.createElement("dialog");
+    dialog.id = "session-editor-dialog";
+    dialog.className =
+      "dialog fixed inset-0 h-fit w-full max-w-2xl rounded-2xl border border-border-light bg-card-light/95 p-0 text-left shadow-card backdrop:bg-black/50 backdrop:backdrop-blur dark:border-border-dark dark:bg-card-dark/95";
+    dialog.innerHTML = `
+      <form id="session-editor-form" class="flex flex-col gap-6 p-6">
+        <header class="flex items-start justify-between gap-4">
+          <div>
+            <h2 data-element="session-dialog-title" class="text-xl font-semibold leading-tight">Trainingseinheit</h2>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Rahmendaten festlegen und planen</p>
+          </div>
+          <button type="button" class="size-10 rounded-full bg-card-light text-text-light-secondary transition hover:bg-zinc-100 dark:bg-card-dark dark:text-text-dark-secondary dark:hover:bg-[#2a3f53]" data-action="close-session-dialog">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Team</span>
+            <select name="team_id" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark"></select>
+          </label>
+          <label class="flex flex-col gap-2 text-sm md:col-span-1">
+            <span>Titel</span>
+            <input name="title" type="text" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" placeholder="z. B. Techniktraining" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Datum</span>
+            <input name="session_date" type="date" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Startzeit</span>
+            <input name="start_time" type="time" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Dauer (Minuten)</span>
+            <input name="duration_minutes" type="number" min="0" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Status</span>
+            <select name="status" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark">
+              <option value="geplant">Geplant</option>
+              <option value="gestartet">Gestartet</option>
+              <option value="abgeschlossen">Abgeschlossen</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-2 text-sm md:col-span-2">
+            <span>Fokus</span>
+            <input name="focus_area" type="text" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" placeholder="z. B. Starts &amp; Wenden" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Soll-Belastung (Meter)</span>
+            <input name="load_target" type="number" min="0" required class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm">
+            <span>Ist-Belastung (Meter)</span>
+            <input name="load_actual" type="number" min="0" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" placeholder="Optional" />
+          </label>
+          <label class="flex flex-col gap-2 text-sm md:col-span-2">
+            <span>Notizen</span>
+            <textarea name="notes" rows="3" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" placeholder="Schwerpunkte oder Hinweise"></textarea>
+          </label>
+        </div>
+        <p data-element="session-dialog-feedback" class="text-xs text-text-light-secondary dark:text-text-dark-secondary"></p>
+        <footer class="flex items-center justify-end gap-3">
+          <button type="button" data-action="close-session-dialog" class="rounded-lg px-4 py-2 text-sm font-medium text-text-light-secondary transition hover:bg-zinc-100 dark:text-text-dark-secondary dark:hover:bg-[#2a3f53]">Abbrechen</button>
+          <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90">Speichern</button>
+        </footer>
+      </form>
+    `;
+    root.appendChild(dialog);
+    form = dialog.querySelector("#session-editor-form");
+    submit = form.querySelector('button[type="submit"]');
+    feedback = form.querySelector('[data-element="session-dialog-feedback"]');
+    title = form.querySelector('[data-element="session-dialog-title"]');
+    dialog.querySelectorAll('[data-action="close-session-dialog"]').forEach((button) =>
+      button.addEventListener("click", () => dialog.close())
+    );
+    dialog.addEventListener("close", () => {
+      form.reset();
+      currentHandler = null;
+      if (feedback) {
+        feedback.textContent = "";
+        feedback.className = "text-xs text-text-light-secondary dark:text-text-dark-secondary";
+      }
+    });
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!currentHandler) return;
+      const payload = collectPayload();
+      if (!payload) {
+        return;
+      }
+      try {
+        submit.disabled = true;
+        submit.classList.add("opacity-75");
+        setFeedback("Speichere...", "info");
+        await currentHandler(payload);
+        setFeedback("Gespeichert", "success");
+        dialog.close();
+      } catch (error) {
+        console.error(error);
+        setFeedback("Speichern fehlgeschlagen.", "error");
+      } finally {
+        submit.disabled = false;
+        submit.classList.remove("opacity-75");
+      }
+    });
+    return dialog;
+  }
+
+  function populateTeams(select, selectedId) {
+    select.innerHTML = "";
+    teams.forEach((team) => {
+      const option = document.createElement("option");
+      option.value = String(team.id);
+      option.textContent = team.name;
+      if (selectedId && Number(selectedId) === team.id) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+    if (!select.value && teams[0]) {
+      select.value = String(teams[0].id);
+    }
+  }
+
+  function setFeedback(message, tone) {
+    if (!feedback) return;
+    let toneClass = "text-text-light-secondary dark:text-text-dark-secondary";
+    if (tone === "error") toneClass = "text-danger";
+    if (tone === "success") toneClass = "text-success";
+    feedback.textContent = message;
+    feedback.className = `text-xs ${toneClass}`;
+  }
+
+  function setFormValues(initial = {}) {
+    const select = form.querySelector('select[name="team_id"]');
+    populateTeams(select, initial.team_id);
+    form.querySelector('input[name="title"]').value = initial.title || "";
+    form.querySelector('input[name="session_date"]').value = initial.session_date || "";
+    form.querySelector('input[name="start_time"]').value = initial.start_time || "";
+    form.querySelector('input[name="duration_minutes"]').value = initial.duration_minutes ?? "60";
+    form.querySelector('select[name="status"]').value = initial.status || "geplant";
+    form.querySelector('input[name="focus_area"]').value = initial.focus_area || "";
+    form.querySelector('input[name="load_target"]').value = initial.load_target ?? "0";
+    form.querySelector('input[name="load_actual"]').value = initial.load_actual ?? "";
+    form.querySelector('textarea[name="notes"]').value = initial.notes || "";
+    setFeedback("", "info");
+  }
+
+  function collectPayload() {
+    const formData = new FormData(form);
+    const teamId = Number(formData.get("team_id"));
+    const titleValue = String(formData.get("title") || "").trim();
+    const sessionDate = formData.get("session_date");
+    const startTime = formData.get("start_time");
+    const duration = Number(formData.get("duration_minutes"));
+    const status = formData.get("status") || "geplant";
+    const focus = String(formData.get("focus_area") || "").trim();
+    const loadTarget = Number(formData.get("load_target"));
+    const loadActualRaw = formData.get("load_actual");
+    const notes = String(formData.get("notes") || "").trim();
+
+    if (!teamId || !titleValue || !sessionDate || !startTime || Number.isNaN(duration) || Number.isNaN(loadTarget)) {
+      setFeedback("Bitte alle Pflichtfelder ausfüllen.", "error");
+      return null;
+    }
+    if (!focus) {
+      setFeedback("Bitte einen Fokus hinterlegen.", "error");
+      return null;
+    }
+
+    const payload = {
+      team_id: teamId,
+      title: titleValue,
+      session_date: sessionDate,
+      start_time: startTime,
+      duration_minutes: duration,
+      status,
+      focus_area: focus,
+      load_target: loadTarget,
+      notes: notes || null,
+    };
+    if (loadActualRaw !== null && loadActualRaw !== "" && !Number.isNaN(Number(loadActualRaw))) {
+      payload.load_actual = Number(loadActualRaw);
+    } else {
+      payload.load_actual = null;
+    }
+    return payload;
+  }
+
+  function open(options, handler) {
+    const dlg = ensureDialog();
+    currentHandler = handler;
+    setFormValues(options.initialValues);
+    if (title) {
+      title.textContent = options.title;
+    }
+    if (submit) {
+      submit.textContent = options.submitLabel;
+    }
+    dlg.showModal();
+  }
+
+  return {
+    openCreate(onSubmit) {
+      const today = new Date();
+      open(
+        {
+          title: "Neue Trainingseinheit",
+          submitLabel: "Erstellen",
+          initialValues: {
+            team_id: teams[0]?.id,
+            title: "",
+            session_date: today.toISOString().slice(0, 10),
+            start_time: "17:00",
+            duration_minutes: 60,
+            status: "geplant",
+            focus_area: "Allgemein",
+            load_target: 3000,
+            load_actual: "",
+            notes: "",
+          },
+        },
+        onSubmit
+      );
+    },
+    openEdit(session, onSubmit) {
+      open(
+        {
+          title: "Training bearbeiten",
+          submitLabel: "Aktualisieren",
+          initialValues: session,
+        },
+        onSubmit
+      );
+    },
+    openDuplicate(session, onSubmit) {
+      let nextDate = session.session_date;
+      const parsed = new Date(session.session_date);
+      if (!Number.isNaN(parsed.getTime())) {
+        parsed.setDate(parsed.getDate() + 7);
+        nextDate = parsed.toISOString().slice(0, 10);
+      }
+      open(
+        {
+          title: "Training duplizieren",
+          submitLabel: "Duplizieren",
+          initialValues: {
+            ...session,
+            title: `${session.title} (Kopie)`,
+            session_date: nextDate,
+            status: "geplant",
+          },
+        },
+        onSubmit
+      );
+    },
+  };
 }
 
 function buildAttendanceRow(entry) {
@@ -229,6 +538,10 @@ export async function renderTrainings(root) {
   const notesFeedback = root.querySelector("#session-notes-feedback");
   const notesButton = root.querySelector('[data-action="save-session-note"]');
   const quickCaptureTrigger = root.querySelector('[data-action="toggle-attendance-mode"]');
+  const createButton = root.querySelector('[data-action="create-session"]');
+  const duplicateButton = root.querySelector('[data-action="duplicate-session"]');
+  const editButton = root.querySelector('[data-action="edit-session"]');
+  const sessionDialog = createSessionDialog(root, teams);
 
   teamSelect.innerHTML = '<option value="all">Alle Mannschaften</option>';
   teams.forEach((team) => {
@@ -238,12 +551,27 @@ export async function renderTrainings(root) {
     teamSelect.appendChild(option);
   });
 
-  renderSessionCards(calendar, sessions);
+  viewSelect.innerHTML = "";
+  [
+    { value: "list", label: "Liste" },
+    { value: "board", label: "Status-Board" },
+  ].forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.value;
+    option.textContent = entry.label;
+    viewSelect.appendChild(option);
+  });
 
   const state = {
     team: "all",
     activeSession: sessions[0]?.id || null,
+    view: viewSelect.value || "list",
   };
+
+  let currentDetail = null;
+  let updateActiveSession = null;
+
+  renderSessionCards(calendar, sessions, state.view);
 
   function highlightActiveCard() {
     calendar.querySelectorAll("button[data-session-id]").forEach((button) => {
@@ -258,7 +586,7 @@ export async function renderTrainings(root) {
       if (state.team === "all") return true;
       return String(session.team_id || session.teamId) === state.team;
     });
-    renderSessionCards(calendar, filtered);
+    renderSessionCards(calendar, filtered, state.view);
     bindCalendarClicks(filtered);
     if (!filtered.length) {
       detailContainer.innerHTML = "";
@@ -275,30 +603,38 @@ export async function renderTrainings(root) {
     }
   }
 
+  async function reloadSessions(newActiveId, { refreshDetail: shouldRefresh = true } = {}) {
+    invalidateSessionsCache();
+    invalidateMatching("dashboard-data-");
+    sessions = await loadSessions();
+    if (typeof newActiveId === "number") {
+      state.activeSession = newActiveId;
+    }
+    applyFilters({ skipDetail: true });
+    highlightActiveCard();
+    if (state.activeSession && shouldRefresh) {
+      await refreshDetail(state.activeSession);
+    }
+  }
+
   async function refreshDetail(sessionId) {
     if (!sessionId) return;
     const detail = await loadSessionDetail(sessionId);
+    currentDetail = detail;
     async function handleSessionUpdate(payload) {
       await api.updateSession(sessionId, payload);
       invalidate(`session-${sessionId}`);
-      invalidate("dashboard-data");
-      invalidateSessionsCache();
-      sessions = await loadSessions();
-      applyFilters({ skipDetail: true });
-      highlightActiveCard();
-      await refreshDetail(sessionId);
+      invalidateMatching("dashboard-data-");
+      await reloadSessions(sessionId);
     }
+    updateActiveSession = handleSessionUpdate;
 
     renderSessionDetail(detailContainer, detail, handleSessionUpdate);
     renderAttendance(attendanceContainer, detail, async (entries) => {
       await api.saveAttendance(sessionId, entries);
       invalidate(`session-${sessionId}`);
-      invalidate("dashboard-data");
-      invalidateSessionsCache();
-      sessions = await loadSessions();
-      applyFilters({ skipDetail: true });
-      highlightActiveCard();
-      await refreshDetail(sessionId);
+      invalidateMatching("dashboard-data-");
+      await reloadSessions(sessionId);
     });
     if (notesField && notesFeedback) {
       notesField.value = detail.session.notes || "";
@@ -332,8 +668,13 @@ export async function renderTrainings(root) {
     applyFilters();
   });
 
-  viewSelect.addEventListener("change", () => {
-    // Platzhalter für zukünftige Kalender-Ansichten
+  viewSelect.addEventListener("change", (event) => {
+    state.view = event.target.value || "list";
+    applyFilters({ skipDetail: true });
+    highlightActiveCard();
+    if (state.activeSession) {
+      refreshDetail(state.activeSession);
+    }
   });
 
   if (notesField && notesFeedback) {
@@ -352,7 +693,7 @@ export async function renderTrainings(root) {
       try {
         await api.updateSession(state.activeSession, { notes: notesField.value.trim() || null });
         invalidate(`session-${state.activeSession}`);
-        invalidate("dashboard-data");
+        invalidateMatching("dashboard-data-");
         notesFeedback.textContent = "Notiz gespeichert.";
         notesFeedback.className = "text-xs text-success";
         await refreshDetail(state.activeSession);
@@ -368,16 +709,61 @@ export async function renderTrainings(root) {
     });
   }
 
+  if (createButton) {
+    createButton.addEventListener("click", () => {
+      sessionDialog.openCreate(async (payload) => {
+        const created = await api.createSession(payload);
+        const newId = created?.session?.id;
+        await reloadSessions(newId ?? undefined);
+      });
+    });
+  }
+
+  if (editButton) {
+    editButton.addEventListener("click", () => {
+      if (!state.activeSession || !currentDetail) {
+        if (notesFeedback) {
+          notesFeedback.textContent = "Bitte zuerst eine Einheit auswählen.";
+          notesFeedback.className = "text-xs text-warning";
+          setTimeout(() => {
+            notesFeedback.textContent = "";
+            notesFeedback.className = "text-xs text-text-light-secondary dark:text-text-dark-secondary";
+          }, 3000);
+        }
+        return;
+      }
+      sessionDialog.openEdit(currentDetail.session, async (payload) => {
+        if (updateActiveSession) {
+          await updateActiveSession(payload);
+        }
+      });
+    });
+  }
+
+  if (duplicateButton) {
+    duplicateButton.addEventListener("click", () => {
+      if (!state.activeSession || !currentDetail) {
+        if (notesFeedback) {
+          notesFeedback.textContent = "Bitte zuerst eine Einheit auswählen.";
+          notesFeedback.className = "text-xs text-warning";
+          setTimeout(() => {
+            notesFeedback.textContent = "";
+            notesFeedback.className = "text-xs text-text-light-secondary dark:text-text-dark-secondary";
+          }, 3000);
+        }
+        return;
+      }
+      sessionDialog.openDuplicate(currentDetail.session, async (payload) => {
+        const duplicated = await api.duplicateSession(state.activeSession, payload);
+        const newId = duplicated?.session?.id;
+        await reloadSessions(newId ?? undefined);
+      });
+    });
+  }
+
   if (quickCaptureTrigger) {
     setupTrainingQuickCapture(root, quickCaptureTrigger, () => state.activeSession, async () => {
-      invalidateSessionsCache();
-      invalidate("dashboard-data");
-      sessions = await loadSessions();
-      applyFilters({ skipDetail: true });
-      highlightActiveCard();
-      if (state.activeSession) {
-        await refreshDetail(state.activeSession);
-      }
+      await reloadSessions(state.activeSession, { refreshDetail: true });
     });
   }
 }
