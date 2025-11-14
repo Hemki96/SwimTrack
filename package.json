@@ -1,0 +1,26 @@
+{
+  "name": "swimtrack",
+  "version": "0.2.0",
+  "description": "SwimTrack Trainingsplattform mit Node.js Backend",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "seed": "node backend/seed.js --reset"
+  },
+  "keywords": [
+    "swimming",
+    "training",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
