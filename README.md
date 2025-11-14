@@ -13,7 +13,8 @@ SwimTrack ist eine vollwertige Trainingsplattform für Schwimmteams. Das Reposit
 8. [NPM-Skripte](#npm-skripte)
 9. [Deployment (Render.com)](#deployment-rendercom)
 10. [Tipps für Erweiterungen](#tipps-für-erweiterungen)
-11. [Fehlerbehebung](#fehlerbehebung)
+11. [Tests & Qualitätssicherung](#tests--qualitätssicherung)
+12. [Fehlerbehebung](#fehlerbehebung)
 
 ## Funktionsumfang
 - **Dashboard:** KPIs zur Anwesenheit, Belastung und Sessions, Alerts, Fokus-Themen, Aktivitätenfeed und Coach-Notizen.
@@ -129,6 +130,11 @@ Statische Assets (`/index.html`, `/src`, `/screens`, `/docs`) werden ebenfalls �
 | `npm start` | Startet den Produktionsserver (`backend/server.js`). |
 | `npm run dev` | Entwicklermodus mit automatischen Restarts via `nodemon`. |
 | `npm run seed` | Erstellt/aktualisiert die SQLite-Datenbank mit Demo-Daten (`--reset` optional). |
+| `npm run lint` | Prüft das gesamte Repository mit ESLint (Backend & Frontend). |
+| `npm run test:backend` | Führt die Node.js Unit-Tests gegen das In-Memory-SQLite-Setup aus. |
+| `npm run test:frontend` | Startet die Vitest-Suite (jsdom) für Hooks und Komponenten. |
+| `npm run test:integration` | Führt die API-Integrationssuite (`tests/api.test.js`) mit echtem Server-Prozess aus. |
+| `npm test` | Orchestriert Linting, Backend-/Frontend-Unit- und Integrations-Tests in einer Pipeline. |
 
 ## Deployment (Render.com)
 1. Repository in Render als **Blueprint** importieren.
@@ -142,6 +148,13 @@ Statische Assets (`/index.html`, `/src`, `/screens`, `/docs`) werden ebenfalls �
 - **Design-Konsistenz:** Halte dich an die Token aus `docs/design-guidelines.md` und nutze Material Symbols Icons über `<span class="material-symbols-outlined">`.
 - **API-Erweiterungen:** Implementiere Queries in `backend/repositories.js`, hänge Express-Routen in `backend/server.js` an und erweitere bei Bedarf die Seed-Daten.
 - **State-Invalidierung:** Nutze `invalidate(key)` oder spezialisierte Helper (z. B. `invalidateSessionsCache`) nach mutierenden Aktionen, damit das UI aktuelle Daten lädt.
+
+## Tests & Qualitätssicherung
+- **Backend-Unit-Tests:** Unter `tests/backend/` laufen Node.js-Tests gegen eine In-Memory-SQLite-Instanz. Das Helper-Modul [`tests/backend/helpers/testDb.js`](./tests/backend/helpers/testDb.js) setzt `SWIMTRACK_DB_PATH=":memory:"`, initialisiert Schema & Seed-Daten und stellt für jede Testdatei eine saubere Datenbank bereit.
+- **Frontend-Unit-Tests:** Die Vitest-Konfiguration ([`vitest.config.js`](./vitest.config.js)) nutzt `jsdom`, um Hooks/Utilities wie [`src/scripts/state.js`](./src/scripts/state.js) und [`src/scripts/templateLoader.js`](./src/scripts/templateLoader.js) isoliert zu testen. Gemeinsame Setups leben in [`tests/frontend/setupTests.js`](./tests/frontend/setupTests.js).
+- **Integrationstests:** [`tests/api.test.js`](./tests/api.test.js) startet das Express-Backend gegen eine temporäre SQLite-Datei und prüft komplette Request-Flows inkl. Dashboard- und Session-Endpunkten.
+- **Zentrales Testkommando:** `npm test` verkettet `npm run lint`, `npm run test:backend`, `npm run test:frontend` und `npm run test:integration`, sodass ein einzelner Befehl Linting sowie sämtliche Unit- und Integrations-Checks abdeckt.
+- **CI-Pipeline:** Die GitHub-Action [`ci.yml`](./.github/workflows/ci.yml) läuft auf jedem Push/PR, führt `npm ci`, ein Datenbank-Seeding (`npm run seed -- --silent`) und anschließend `npm test` aus. Dadurch ist sichergestellt, dass Linting, Unit- und Integrations-Tests inklusive Seed-Voraussetzung automatisch geprüft werden.
 
 ## Fehlerbehebung
 | Problem | Hinweis |
