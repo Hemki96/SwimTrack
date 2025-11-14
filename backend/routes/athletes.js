@@ -6,13 +6,23 @@ const {
   updateAthlete,
   deleteAthlete,
 } = require('../controllers/athletes');
+const validate = require('../middleware/validate');
+const {
+  validateCreateAthlete,
+  validateUpdateAthlete,
+  validateAthleteIdParams,
+} = require('../validation/athletes');
 
 const router = express.Router();
 
 router.get('/', listAthletes);
-router.get('/:athleteId', getAthlete);
-router.post('/', createAthlete);
-router.patch('/:athleteId', updateAthlete);
-router.delete('/:athleteId', deleteAthlete);
+router.get('/:athleteId', validate({ params: validateAthleteIdParams }), getAthlete);
+router.post('/', validate({ body: validateCreateAthlete }), createAthlete);
+router.patch(
+  '/:athleteId',
+  validate({ params: validateAthleteIdParams, body: validateUpdateAthlete }),
+  updateAthlete
+);
+router.delete('/:athleteId', validate({ params: validateAthleteIdParams }), deleteAthlete);
 
 module.exports = router;

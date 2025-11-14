@@ -1,78 +1,57 @@
 const repositories = require('../repositories');
+const { createHttpError } = require('../utils/httpError');
 
-function listTeams(req, res) {
+function listTeams(req, res, next) {
   try {
     res.json(repositories.fetchTeams());
   } catch (error) {
-    res.status(500).json({ detail: 'Teams konnten nicht geladen werden', error: error.message });
+    next(error);
   }
 }
 
-function getTeam(req, res) {
+function getTeam(req, res, next) {
   try {
-    const team = repositories.fetchTeam(Number(req.params.teamId));
+    const team = repositories.fetchTeam(req.params.teamId);
     if (!team) {
-      res.status(404).json({ detail: 'Team nicht gefunden' });
+      next(createHttpError(404, 'Team nicht gefunden'));
       return;
     }
     res.json(team);
   } catch (error) {
-    res.status(500).json({ detail: 'Team konnte nicht geladen werden', error: error.message });
+    next(error);
   }
 }
 
-function createTeam(req, res) {
+function createTeam(req, res, next) {
   try {
-    const { name, short_name, level, coach, training_days, focus_theme } = req.body || {};
-    const required = [name, short_name, level, coach, training_days, focus_theme];
-    if (required.some((value) => value === undefined || value === null || value === '')) {
-      res.status(400).json({ detail: 'Pflichtfelder fehlen für die Erstellung des Teams' });
-      return;
-    }
-    const team = repositories.createTeam({
-      name,
-      short_name,
-      level,
-      coach,
-      training_days,
-      focus_theme,
-    });
+    const team = repositories.createTeam(req.body);
     res.status(201).json(team);
   } catch (error) {
-    res.status(500).json({ detail: 'Team konnte nicht erstellt werden', error: error.message });
+    next(error);
   }
 }
 
-function updateTeam(req, res) {
+function updateTeam(req, res, next) {
   try {
-    const updated = repositories.updateTeam(Number(req.params.teamId), req.body || {});
+    const updated = repositories.updateTeam(req.params.teamId, req.body || {});
     if (!updated) {
-      res.status(404).json({ detail: 'Team nicht gefunden' });
+      next(createHttpError(404, 'Team nicht gefunden'));
       return;
     }
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ detail: 'Team konnte nicht aktualisiert werden', error: error.message });
+    next(error);
   }
 }
 
-function deleteTeam(req, res) {
+function deleteTeam(req, res, next) {
   try {
-    const teamId = Number(req.params.teamId);
-    if (Number.isNaN(teamId)) {
-      res.status(400).json({ detail: 'Ungültige Team-ID' });
-      return;
-    }
-
-    const forceParam = req.query.force;
-    const force =
-      typeof forceParam === 'string'
-        ? ['1', 'true', 'yes', 'on'].includes(forceParam.toLowerCase())
-        : forceParam === true;
+    const { teamId } = req.params;
+    const { force } = req.query;
 
     const result = repositories.deleteTeam(teamId, { force });
     if (!result.found) {
-      res.status(404).json({ detail: 'Team nicht gefunden' });
+      next(createHttpError(404, 'Team nicht gefunden'));
       return;
     }
     if (!result.deleted) {
@@ -86,7 +65,7 @@ function deleteTeam(req, res) {
     }
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ detail: 'Team konnte nicht gelöscht werden', error: error.message });
+    next(error);
   }
 }
 
