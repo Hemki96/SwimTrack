@@ -603,9 +603,16 @@ export async function renderTrainings(root) {
     }
   }
 
-  async function reloadSessions(newActiveId, { refreshDetail: shouldRefresh = true } = {}) {
-    invalidateSessionsCache();
-    invalidateMatching("dashboard-data-");
+  async function reloadSessions(
+    newActiveId,
+    { refreshDetail: shouldRefresh = true, invalidateCache = true, invalidateDashboard = true } = {}
+  ) {
+    if (invalidateCache) {
+      invalidateSessionsCache();
+    }
+    if (invalidateDashboard) {
+      invalidateMatching("dashboard-data-");
+    }
     sessions = await loadSessions();
     if (typeof newActiveId === "number") {
       state.activeSession = newActiveId;
@@ -623,8 +630,6 @@ export async function renderTrainings(root) {
     currentDetail = detail;
     async function handleSessionUpdate(payload) {
       await api.updateSession(sessionId, payload);
-      invalidate(`session-${sessionId}`);
-      invalidateMatching("dashboard-data-");
       await reloadSessions(sessionId);
     }
     updateActiveSession = handleSessionUpdate;
@@ -632,8 +637,6 @@ export async function renderTrainings(root) {
     renderSessionDetail(detailContainer, detail, handleSessionUpdate);
     renderAttendance(attendanceContainer, detail, async (entries) => {
       await api.saveAttendance(sessionId, entries);
-      invalidate(`session-${sessionId}`);
-      invalidateMatching("dashboard-data-");
       await reloadSessions(sessionId);
     });
     if (notesField && notesFeedback) {
@@ -692,7 +695,7 @@ export async function renderTrainings(root) {
       }
       try {
         await api.updateSession(state.activeSession, { notes: notesField.value.trim() || null });
-        invalidate(`session-${state.activeSession}`);
+        invalidateSessionsCache();
         invalidateMatching("dashboard-data-");
         notesFeedback.textContent = "Notiz gespeichert.";
         notesFeedback.className = "text-xs text-success";
@@ -763,13 +766,18 @@ export async function renderTrainings(root) {
 
   if (quickCaptureTrigger) {
     setupTrainingQuickCapture(root, quickCaptureTrigger, () => state.activeSession, async () => {
-      await reloadSessions(state.activeSession, { refreshDetail: true });
+      await reloadSessions(state.activeSession, {
+        refreshDetail: true,
+        invalidateCache: false,
+        invalidateDashboard: false,
+      });
     });
   }
 }
 
 export function invalidateSessionsCache() {
   invalidate("sessions-all");
+  invalidateMatching("session-");
 }
 
 function setupTrainingQuickCapture(root, trigger, getActiveSessionId, onSaved) {
@@ -851,6 +859,8 @@ function setupTrainingQuickCapture(root, trigger, getActiveSessionId, onSaved) {
       });
       dialog.close();
       form.reset();
+      invalidateSessionsCache();
+      invalidateMatching("dashboard-data-");
       if (typeof onSaved === "function") {
         await onSaved();
       }
