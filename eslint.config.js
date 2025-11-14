@@ -18,6 +18,8 @@ const nodeGlobals = {
   URL: 'readonly',
   URLSearchParams: 'readonly',
   AbortController: 'readonly',
+  Intl: 'readonly',
+  Response: 'readonly',
 };
 
 const browserGlobals = {
@@ -38,6 +40,8 @@ const browserGlobals = {
   clearInterval: 'readonly',
   performance: 'readonly',
   AbortController: 'readonly',
+  Intl: 'readonly',
+  Response: 'readonly',
   global: 'readonly',
 };
 

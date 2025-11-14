@@ -9,3 +9,5 @@ export {
 } from "./cache.js";
 
 export { publish, subscribe, once, resetChannels } from "./events.js";
+
+export { Channels } from "./channels.js";

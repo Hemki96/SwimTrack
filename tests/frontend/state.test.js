@@ -1,10 +1,12 @@
-import { describe, it, beforeEach, expect } from 'vitest';
+import { describe, it, beforeEach, expect, vi } from 'vitest';
 import {
   getCached,
   setCached,
   invalidate,
   invalidateMatching,
   clearCache,
+  remember,
+  Channels,
 } from '../../src/scripts/state.js';
 
 describe('state cache helpers', () => {
@@ -42,5 +44,39 @@ describe('state cache helpers', () => {
     expect(getCached('team:1')).toBeUndefined();
     expect(getCached('team:2')).toBeUndefined();
     expect(getCached('athlete:1')).toEqual({});
+  });
+
+  it('memoizes async loaders via remember', async () => {
+    const loader = vi.fn(async () => 'value');
+    expect(await remember('remember:test', loader)).toBe('value');
+    expect(loader).toHaveBeenCalledTimes(1);
+    expect(await remember('remember:test', loader)).toBe('value');
+    expect(loader).toHaveBeenCalledTimes(1);
+  });
+
+  it('expires remembered values after TTL', async () => {
+    vi.useFakeTimers();
+    try {
+      let counter = 0;
+      const loader = vi.fn(async () => {
+        counter += 1;
+        return counter;
+      });
+      expect(await remember('ttl:test', loader, { ttl: 1_000 })).toBe(1);
+      expect(loader).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(500);
+      expect(await remember('ttl:test', loader, { ttl: 1_000 })).toBe(1);
+      expect(loader).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(600);
+      expect(await remember('ttl:test', loader, { ttl: 1_000 })).toBe(2);
+      expect(loader).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('exposes canonical channel names', () => {
+    expect(Channels.SESSIONS_UPDATED).toBe('sessions/updated');
+    expect(Channels.TEAMS_UPDATED).toBe('teams/updated');
   });
 });

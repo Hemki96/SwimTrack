@@ -1,47 +1,53 @@
 # Frontend State Patterns
 
-Die Frontend-State-Schicht bündelt Cache-Handling und Eventing im Modul `src/scripts/state/`. Die folgenden Konventionen helfen dabei, konsistente Datenflüsse zwischen den Views zu behalten.
+Die Frontend-State-Schicht bündelt Cache-Handling und Eventing im Modul `src/scripts/state/`. Ergänzend definieren `src/scripts/config/cachePolicies.js` und `src/scripts/state/channels.js` gemeinsame Konstanten, damit Views dieselben Schlüssel und Laufzeiten verwenden.
 
 ## Cache-Grundlagen
 
-- **Ablage**: Alle Werte werden über `state.setCached(key, value, { ttl })` persistiert. `ttl` erwartet Millisekunden und sorgt dafür, dass Einträge automatisch invalidiert werden, wenn sie ablaufen.
-- **Lesen**: Nutze `state.getCached(key)` und prüfe auf `undefined`. Für Lazy-Loader steht `state.remember(key, loader, { ttl })` zur Verfügung.
-- **Namenskonventionen**: Verwende sprechende Schlüssel mit Präfixen (z. B. `session-<id>` oder `dashboard-data-<range>`), um gezieltes Invalidieren zu erleichtern.
+- **Ablage**: Alle Werte werden über `state.setCached(key, value, { ttl })` persistiert. `ttl` erwartet Millisekunden und sorgt dafür, dass Einträge automatisch invalidiert werden, wenn sie ablaufen. Für neue Loader lohnt sich `CachePolicies` (z. B. `CachePolicies.SESSIONS_COLLECTION.ttl`).
+- **Lesen**: Nutze `state.remember(key, loader, { ttl })`, um Laden und Caching zu kombinieren. Die Funktion übernimmt das Zurückschreiben in den Cache, wenn der Loader einen Wert liefert.
+- **Namenskonventionen**: Verwende sprechende Schlüssel mit Präfixen (z. B. `${CachePolicies.SESSION_DETAIL.key}-<id>` oder `${CachePolicies.DASHBOARD.key}-<range>`), um gezieltes Invalidieren zu erleichtern.
 - **Beispiele**:
   ```js
-  const SESSION_LIST_KEY = "sessions-all";
-  const SESSION_LIST_TTL = 60 * 1000; // 1 Minute
+  import { CachePolicies, getCacheTtl } from '../config/cachePolicies.js';
+  import { remember } from '../state.js';
 
-  async function loadSessions() {
-    const cached = getCached(SESSION_LIST_KEY);
-    if (cached) return cached;
-    const sessions = await api.getSessions();
-    return setCached(SESSION_LIST_KEY, sessions, { ttl: SESSION_LIST_TTL });
+  const SESSION_LIST_KEY = `${CachePolicies.SESSIONS_COLLECTION.key}-all`;
+
+  function loadSessions() {
+    return remember(
+      SESSION_LIST_KEY,
+      () => api.getSessions(),
+      { ttl: getCacheTtl(CachePolicies.SESSIONS_COLLECTION) }
+    );
   }
   ```
 
 ## Ereignisgesteuerte Invalidierung
 
-- **Publizieren**: Nach mutierenden API-Calls ein Event senden, z. B. `state.publish('sessions/updated', { id, action })`. So können andere Views gezielt reagieren, ohne globale Clears auszulösen.
+- **Publizieren**: Nach mutierenden API-Calls ein Event senden, z. B. `state.publish(Channels.SESSIONS_UPDATED, { id, action })`. So können andere Views gezielt reagieren, ohne globale Clears auszulösen.
 - **Abonnieren**: Registriere Listener einmalig (z. B. auf Modulebene) und räume die betroffenen Cache-Einträge auf.
   ```js
+  import { Channels, invalidate, invalidateMatching, subscribe } from '../state.js';
+  import { CachePolicies } from '../config/cachePolicies.js';
+
   let detachSessionsListener = null;
 
   function ensureSessionsSubscription() {
     if (!detachSessionsListener) {
-      detachSessionsListener = subscribe('sessions/updated', (event) => {
-        invalidate('sessions-all');
+      detachSessionsListener = subscribe(Channels.SESSIONS_UPDATED, (event) => {
+        invalidate(`${CachePolicies.SESSIONS_COLLECTION.key}-all`);
         if (event?.id) {
-          invalidate(`session-${event.id}`);
+          invalidate(`${CachePolicies.SESSION_DETAIL.key}-${event.id}`);
         } else {
-          invalidateMatching('session-');
+          invalidateMatching(CachePolicies.SESSION_DETAIL.key);
         }
       });
     }
   }
   ```
 - **Payloads**: Enthalten optional `id`, `action` oder zusätzliche Metadaten und bleiben bewusst frei gestaltet.
-- **Kanäle**: Aktuell werden u. a. `sessions/updated` und `teams/updated` genutzt. Weitere Channels können bei Bedarf ergänzt werden.
+- **Kanäle**: Aktuell werden u. a. `Channels.SESSIONS_UPDATED` und `Channels.TEAMS_UPDATED` genutzt. Weitere Channels können bei Bedarf ergänzt werden.
 
 ## Force-Refresh & TTL
 
@@ -50,7 +56,7 @@ Die Frontend-State-Schicht bündelt Cache-Handling und Eventing im Modul `src/sc
 
 ## Fehlerbehandlung & Retries
 
-- API-Aufrufe über `src/scripts/api.js` werfen bei Fehlern einen `DomainError` mit Typ (`timeout`, `network_error`, `validation_error`, …) und optionalen Details.
+- API-Aufrufe über `src/scripts/api.js` werfen bei Fehlern einen `DomainError` mit Typ (`timeout`, `network_error`, `validation_error`, …) und optionalen Details. Die Implementierung basiert auf `createHttpClient` (`src/scripts/services/httpClient.js`) und kann bei Bedarf projektspezifisch konfiguriert werden.
 - Optional lassen sich Retries (`retry: { retries: 2 }`) oder Timeouts (`timeout: 8000`) direkt am Request konfigurieren.
 - Fehler lassen sich gezielt behandeln:
   ```js
