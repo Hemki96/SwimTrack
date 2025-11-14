@@ -1,12 +1,23 @@
 const API_BASE = window.__SWIMTRACK_API__ || "http://localhost:8000";
 
 async function request(path, options = {}) {
+  const {
+    headers: customHeaders = {},
+    body,
+    method = "GET",
+    ...rest
+  } = options;
+
   const response = await fetch(`${API_BASE}${path}`, {
+    method,
+    body,
     headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
+      ...(method !== "GET" || body != null
+        ? { "Content-Type": "application/json" }
+        : {}),
+      ...customHeaders,
     },
-    ...options,
+    ...rest,
   });
   if (!response.ok) {
     const text = await response.text();
