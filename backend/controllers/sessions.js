@@ -1,4 +1,4 @@
-const repositories = require('../repositories');
+const sessionService = require('../services/sessions');
 const { createHttpError } = require('../utils/httpError');
 
 function listSessions(req, res, next) {
@@ -13,7 +13,7 @@ function listSessions(req, res, next) {
     if (req.query.with_attendance !== undefined) {
       filters.includeAttendance = req.query.with_attendance;
     }
-    res.json(repositories.fetchSessions(filters));
+    res.json(sessionService.listSessions(filters));
   } catch (error) {
     next(error);
   }
@@ -21,7 +21,7 @@ function listSessions(req, res, next) {
 
 function getSession(req, res, next) {
   try {
-    const session = repositories.fetchSession(req.params.sessionId);
+    const session = sessionService.getSession(req.params.sessionId);
     if (!session) {
       next(createHttpError(404, 'Trainingseinheit nicht gefunden'));
       return;
@@ -34,7 +34,7 @@ function getSession(req, res, next) {
 
 function deleteSession(req, res, next) {
   try {
-    const deleted = repositories.deleteSession(req.params.sessionId);
+    const deleted = sessionService.deleteSession(req.params.sessionId);
     if (!deleted) {
       next(createHttpError(404, 'Trainingseinheit nicht gefunden'));
       return;
@@ -47,7 +47,7 @@ function deleteSession(req, res, next) {
 
 function updateSession(req, res, next) {
   try {
-    const updated = repositories.updateSession(req.params.sessionId, req.body || {});
+    const updated = sessionService.updateSession(req.params.sessionId, req.body || {});
     if (!updated) {
       next(createHttpError(404, 'Trainingseinheit nicht gefunden'));
       return;
@@ -60,7 +60,7 @@ function updateSession(req, res, next) {
 
 function createSession(req, res, next) {
   try {
-    const created = repositories.createSession(req.body);
+    const created = sessionService.createSession(req.body);
     res.status(201).json(created);
   } catch (error) {
     next(error);
@@ -69,7 +69,7 @@ function createSession(req, res, next) {
 
 function duplicateSession(req, res, next) {
   try {
-    const duplicated = repositories.duplicateSession(req.params.sessionId, req.body || {});
+    const duplicated = sessionService.duplicateSession(req.params.sessionId, req.body || {});
     if (!duplicated) {
       next(createHttpError(404, 'Ausgangseinheit nicht gefunden'));
       return;
@@ -82,8 +82,7 @@ function duplicateSession(req, res, next) {
 
 function upsertAttendance(req, res, next) {
   try {
-    repositories.upsertAttendance(req.params.sessionId, req.body);
-    const session = repositories.fetchSession(req.params.sessionId);
+    const session = sessionService.updateAttendance(req.params.sessionId, req.body);
     if (!session) {
       next(createHttpError(404, 'Trainingseinheit nicht gefunden'));
       return;

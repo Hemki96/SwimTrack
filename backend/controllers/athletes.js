@@ -1,9 +1,9 @@
-const repositories = require('../repositories');
+const athleteService = require('../services/athletes');
 const { createHttpError } = require('../utils/httpError');
 
 function listAthletes(req, res, next) {
   try {
-    res.json(repositories.fetchAthletes());
+    res.json(athleteService.listAthletes());
   } catch (error) {
     next(error);
   }
@@ -11,7 +11,7 @@ function listAthletes(req, res, next) {
 
 function getAthlete(req, res, next) {
   try {
-    const athlete = repositories.fetchAthlete(req.params.athleteId);
+    const athlete = athleteService.getAthlete(req.params.athleteId);
     if (!athlete) {
       next(createHttpError(404, 'Athlet:in nicht gefunden'));
       return;
@@ -24,7 +24,7 @@ function getAthlete(req, res, next) {
 
 function createAthlete(req, res, next) {
   try {
-    const created = repositories.createAthlete(req.body);
+    const created = athleteService.createAthlete(req.body);
     res.status(201).json(created);
   } catch (error) {
     next(error);
@@ -33,7 +33,7 @@ function createAthlete(req, res, next) {
 
 function updateAthlete(req, res, next) {
   try {
-    const updated = repositories.updateAthlete(req.params.athleteId, req.body || {});
+    const updated = athleteService.updateAthlete(req.params.athleteId, req.body || {});
     if (!updated) {
       next(createHttpError(404, 'Athlet:in nicht gefunden'));
       return;
@@ -46,7 +46,7 @@ function updateAthlete(req, res, next) {
 
 function deleteAthlete(req, res, next) {
   try {
-    const deleted = repositories.deleteAthlete(req.params.athleteId);
+    const deleted = athleteService.deleteAthlete(req.params.athleteId);
     if (!deleted) {
       next(createHttpError(404, 'Athlet:in nicht gefunden'));
       return;

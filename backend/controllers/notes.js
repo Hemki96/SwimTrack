@@ -1,4 +1,4 @@
-const repositories = require('../repositories');
+const notesService = require('../services/notes');
 
 function createNote(req, res) {
   try {
@@ -7,7 +7,7 @@ function createNote(req, res) {
       res.status(400).json({ detail: 'Notiz darf nicht leer sein' });
       return;
     }
-    const note = repositories.saveNote(body.trim());
+    const note = notesService.createNote(body.trim());
     res.json(note);
   } catch (error) {
     res.status(500).json({ detail: 'Notiz konnte nicht gespeichert werden', error: error.message });

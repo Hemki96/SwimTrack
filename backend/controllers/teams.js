@@ -1,9 +1,9 @@
-const repositories = require('../repositories');
+const teamsService = require('../services/teams');
 const { createHttpError } = require('../utils/httpError');
 
 function listTeams(req, res, next) {
   try {
-    res.json(repositories.fetchTeams());
+    res.json(teamsService.listTeams());
   } catch (error) {
     next(error);
   }
@@ -11,7 +11,7 @@ function listTeams(req, res, next) {
 
 function getTeam(req, res, next) {
   try {
-    const team = repositories.fetchTeam(req.params.teamId);
+    const team = teamsService.getTeam(req.params.teamId);
     if (!team) {
       next(createHttpError(404, 'Team nicht gefunden'));
       return;
@@ -24,7 +24,7 @@ function getTeam(req, res, next) {
 
 function createTeam(req, res, next) {
   try {
-    const team = repositories.createTeam(req.body);
+    const team = teamsService.createTeam(req.body);
     res.status(201).json(team);
   } catch (error) {
     next(error);
@@ -33,7 +33,7 @@ function createTeam(req, res, next) {
 
 function updateTeam(req, res, next) {
   try {
-    const updated = repositories.updateTeam(req.params.teamId, req.body || {});
+    const updated = teamsService.updateTeam(req.params.teamId, req.body || {});
     if (!updated) {
       next(createHttpError(404, 'Team nicht gefunden'));
       return;
@@ -49,7 +49,7 @@ function deleteTeam(req, res, next) {
     const { teamId } = req.params;
     const { force } = req.query;
 
-    const result = repositories.deleteTeam(teamId, { force });
+    const result = teamsService.deleteTeam(teamId, { force });
     if (!result.found) {
       next(createHttpError(404, 'Team nicht gefunden'));
       return;
