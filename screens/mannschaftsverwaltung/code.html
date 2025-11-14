@@ -21,8 +21,10 @@
   >
     <div class="relative flex min-h-screen w-full flex-col">
       <div class="flex h-full w-full" data-screen-root>
-        <aside class="flex w-64 flex-col bg-background-dark p-4 text-white">
-          <div class="flex items-center gap-3 rounded-lg p-3">
+        <aside
+          class="sticky top-0 flex h-screen w-72 shrink-0 flex-col overflow-y-auto border-r border-border-light bg-card-light/95 px-6 py-8 text-text-light-primary backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/90 dark:text-white"
+        >
+          <div class="flex items-center gap-3">
             <div class="size-8 text-primary">
               <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -33,25 +35,85 @@
             </div>
             <h1 class="text-xl font-bold leading-tight">SwimTrack</h1>
           </div>
-          <nav class="mt-8 flex flex-1 flex-col justify-between" aria-label="Hauptnavigation">
+          <nav class="mt-10 flex flex-1 flex-col gap-8" aria-label="Hauptnavigation">
             <div class="flex flex-col gap-2" data-nav-primary>
-              <button type="button" data-route="dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></button>
-              <button type="button" data-route="trainings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">calendar_month</span><span>Trainingsplanung</span></button>
-              <button type="button" data-route="athletes" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">groups</span><span>Athleten</span></button>
-              <button type="button" data-route="performance" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">monitoring</span><span>Leistungsdaten</span></button>
-              <button type="button" data-route="reports" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">bar_chart</span><span>Reports &amp; Export</span></button>
+              <button
+                type="button"
+                data-route="dashboard"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+              >
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Dashboard</span>
+              </button>
+              <button
+                type="button"
+                data-route="trainings"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+              >
+                <span class="material-symbols-outlined">calendar_month</span>
+                <span>Trainingsplanung</span>
+              </button>
+              <button
+                type="button"
+                data-route="athletes"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+              >
+                <span class="material-symbols-outlined">groups</span>
+                <span>Athleten</span>
+              </button>
+              <button
+                type="button"
+                data-route="performance"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+              >
+                <span class="material-symbols-outlined">monitoring</span>
+                <span>Leistungsdaten</span>
+              </button>
+              <button
+                type="button"
+                data-route="reports"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+              >
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span>Reports &amp; Export</span>
+              </button>
             </div>
-            <div class="flex flex-col gap-2" data-nav-secondary>
-              <button type="button" data-route="teams" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-white transition-colors hover:bg-white/10"><span class="material-symbols-outlined">diversity_3</span><span>Mannschaften</span></button>
-              <button type="button" data-route="settings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">settings</span><span>Einstellungen</span></button>
-              <div class="mt-4 flex items-center gap-3 border-t border-white/10 pt-4">
+            <div class="mt-auto flex flex-col gap-2" data-nav-secondary>
+              <button
+                type="button"
+                data-theme-toggle
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+                aria-label="Darstellung wechseln"
+              >
+                <span class="material-symbols-outlined text-lg" data-theme-toggle-icon>dark_mode</span>
+                <span data-theme-toggle-label>Dunkelmodus</span>
+              </button>
+              <button
+                type="button"
+                data-route="teams"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+              >
+                <span class="material-symbols-outlined">diversity_3</span>
+                <span>Mannschaften</span>
+              </button>
+              <button
+                type="button"
+                data-route="settings"
+                class="flex items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium text-text-light-secondary transition-colors hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-text-dark-secondary dark:hover:bg-white/10"
+              >
+                <span class="material-symbols-outlined">settings</span>
+                <span>Einstellungen</span>
+              </button>
+              <div
+                class="mt-6 flex items-center gap-3 rounded-xl border border-border-light bg-card-light/70 px-3 py-3 text-left text-sm text-text-light-secondary dark:border-border-dark dark:bg-card-dark/60 dark:text-text-dark-secondary"
+              >
                 <div
                   class="size-10 shrink-0 rounded-full bg-cover bg-center bg-no-repeat"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuACRaMkGk88fACEIyNhdOUQnsl1VyAenm4mnjdlxO3SlSBs-hldGWQkSUdrpZaGhaonSCDHsy8vSwdlCqb_3k2hTNpxpGgE5OfPnRgYHC1u7gOqE55U-kk-Bc99in9p_p32KXwPxTN8z6C5C23xkv_2TGqKNm0FHrpGhwK8RfekaA_VkqJKsWnimeYpNKG-he7d3h2o02S2YMzPrye5d8Et2WIW2P3giodOphaG9grOI6iPxCLhjOt9ovqSF3MY7Iyoxy0TED0k1Pc");'
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuACRaMkGk88fACEIyNhdOUQnsl1Vyaenm4mnjdlxO3SlSBs-hldGWQkSUdrpZaGhaonSCDHsy8vSwdlCqb_3k2hTNpxpGgE5OfPnRgYHC1u7gOqE55U-kk-Bc99in9p_p32KXwPxTN8z6C5C23xkv_2TGqKNm0FHrpGhwK8RfekaA_VkqJKsWnimeYpNKG-he7d3h2o02S2YMzPrye5d8Et2WIW2P3giodOphaG9grOI6iPxCLhjOt9ovqSF3MY7Iyoxy0TED0k1Pc");'
                 ></div>
-                <div class="flex flex-col overflow-hidden">
+                <div class="flex flex-col overflow-hidden text-text-light-primary dark:text-white">
                   <p class="truncate text-base font-semibold leading-tight">Max Mustermann</p>
-                  <p class="truncate text-sm text-text-dark-secondary">Cheftrainer</p>
+                  <p class="truncate text-sm text-text-light-secondary dark:text-text-dark-secondary">Cheftrainer</p>
                 </div>
               </div>
             </div>
