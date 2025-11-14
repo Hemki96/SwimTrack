@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-node backend/seed.js --reset
-node backend/server.js
+export NODE_ENV="${NODE_ENV:-production}"
+
+exec node backend/server.js

@@ -2,9 +2,10 @@ const Database = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
 
+const config = require('./config');
+
 const BASE_DIR = __dirname;
-const DEFAULT_DB_PATH = path.join(BASE_DIR, '..', 'swimtrack.db');
-const DB_PATH = process.env.SWIMTRACK_DB_PATH || DEFAULT_DB_PATH;
+const DB_PATH = config.databasePath;
 
 let instance;
 
@@ -34,11 +35,15 @@ function getDatabase() {
   return instance;
 }
 
-function resetDatabase() {
+function closeDatabase() {
   if (instance) {
     instance.close();
     instance = null;
   }
+}
+
+function resetDatabase() {
+  closeDatabase();
   if (fs.existsSync(DB_PATH)) {
     fs.unlinkSync(DB_PATH);
   }
@@ -50,5 +55,6 @@ module.exports = {
   DB_PATH,
   getDatabase,
   initialiseSchema,
+  closeDatabase,
   resetDatabase,
 };
