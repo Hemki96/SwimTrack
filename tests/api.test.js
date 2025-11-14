@@ -220,3 +220,217 @@ test('POST /teams creates a new team that is returned by GET /teams', async () =
   assert.ok(Array.isArray(teams));
   assert.ok(teams.some((team) => team.name === payload.name));
 });
+
+test('DELETE /sessions/:sessionId entfernt Trainingseinheit vollständig', async () => {
+  const payload = {
+    team_id: dataset.team_ids[0],
+    title: 'Tempoläufe Sprint',
+    session_date: calculateRangeStart(3),
+    start_time: '18:30',
+    duration_minutes: 70,
+    status: 'geplant',
+    focus_area: 'Sprint',
+    load_target: 150,
+    load_actual: 0,
+    notes: 'Kurz vor Wettkampf',
+  };
+
+  const createResponse = await fetch(`http://127.0.0.1:${PORT}/sessions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  assert.equal(createResponse.status, 201);
+  const created = await createResponse.json();
+  const sessionId = created.session.id;
+  assert.ok(sessionId > 0);
+
+  const deleteResponse = await fetch(`http://127.0.0.1:${PORT}/sessions/${sessionId}`, { method: 'DELETE' });
+  assert.equal(deleteResponse.status, 204);
+
+  const fetchResponse = await fetch(`http://127.0.0.1:${PORT}/sessions/${sessionId}`);
+  assert.equal(fetchResponse.status, 404);
+});
+
+test('Athlet:innen-Endpunkte unterstützen vollständige CRUD-Operationen', async () => {
+  const payload = {
+    first_name: 'Mila',
+    last_name: 'Korn',
+    birth_year: 2008,
+    primary_stroke: 'Brust',
+    best_event: '200m Brust',
+    personal_best: 142.56,
+    personal_best_unit: 's',
+    focus_note: 'Arme aktivieren',
+    team_id: dataset.team_ids[0],
+  };
+
+  const createResponse = await fetch(`http://127.0.0.1:${PORT}/athletes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  assert.equal(createResponse.status, 201);
+  const created = await createResponse.json();
+  assert.ok(created.athlete);
+  const athleteId = created.athlete.id;
+  assert.ok(athleteId > 0);
+  assert.equal(created.athlete.first_name, payload.first_name);
+
+  const detailResponse = await fetch(`http://127.0.0.1:${PORT}/athletes/${athleteId}`);
+  assert.equal(detailResponse.status, 200);
+  const detail = await detailResponse.json();
+  assert.equal(detail.athlete.id, athleteId);
+
+  const updatePayload = { focus_note: 'Technik verbessert', personal_best: 141.9 };
+  const updateResponse = await fetch(`http://127.0.0.1:${PORT}/athletes/${athleteId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updatePayload),
+  });
+  assert.equal(updateResponse.status, 200);
+  const updated = await updateResponse.json();
+  assert.equal(updated.athlete.focus_note, updatePayload.focus_note);
+  assert.equal(updated.athlete.personal_best, updatePayload.personal_best);
+
+  const deleteResponse = await fetch(`http://127.0.0.1:${PORT}/athletes/${athleteId}`, { method: 'DELETE' });
+  assert.equal(deleteResponse.status, 204);
+
+  const afterDelete = await fetch(`http://127.0.0.1:${PORT}/athletes/${athleteId}`);
+  assert.equal(afterDelete.status, 404);
+});
+
+test('Metrik-Endpunkte ermöglichen vollständige CRUD-Abläufe', async () => {
+  const payload = {
+    athlete_id: dataset.athlete_ids[0],
+    metric_date: calculateRangeStart(-2),
+    metric_type: 'Laktat-Test',
+    value: 4.2,
+    unit: 'mmol/l',
+  };
+
+  const createResponse = await fetch(`http://127.0.0.1:${PORT}/metrics`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  assert.equal(createResponse.status, 201);
+  const created = await createResponse.json();
+  assert.ok(created.id);
+  const metricId = created.id;
+
+  const detailResponse = await fetch(`http://127.0.0.1:${PORT}/metrics/${metricId}`);
+  assert.equal(detailResponse.status, 200);
+  const detail = await detailResponse.json();
+  assert.equal(detail.id, metricId);
+  assert.equal(detail.metric_type, payload.metric_type);
+
+  const updatePayload = { value: 4.05, unit: 'mmol' };
+  const updateResponse = await fetch(`http://127.0.0.1:${PORT}/metrics/${metricId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updatePayload),
+  });
+  assert.equal(updateResponse.status, 200);
+  const updated = await updateResponse.json();
+  assert.equal(updated.value, updatePayload.value);
+  assert.equal(updated.unit, updatePayload.unit);
+
+  const deleteResponse = await fetch(`http://127.0.0.1:${PORT}/metrics/${metricId}`, { method: 'DELETE' });
+  assert.equal(deleteResponse.status, 204);
+
+  const afterDelete = await fetch(`http://127.0.0.1:${PORT}/metrics/${metricId}`);
+  assert.equal(afterDelete.status, 404);
+});
+
+test('DELETE /teams berücksichtigt Abhängigkeiten und unterstützt force-Löschung', async () => {
+  const teamPayload = {
+    name: 'Testteam Force',
+    short_name: 'TTF',
+    level: 'U14',
+    coach: 'Coach Test',
+    training_days: 'Mo, Do',
+    focus_theme: 'Koordination',
+  };
+
+  const teamResponse = await fetch(`http://127.0.0.1:${PORT}/teams`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(teamPayload),
+  });
+  assert.equal(teamResponse.status, 201);
+  const teamBody = await teamResponse.json();
+  const teamId = teamBody.team.id;
+
+  const athleteResponse = await fetch(`http://127.0.0.1:${PORT}/athletes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      first_name: 'Lars',
+      last_name: 'Testmann',
+      birth_year: 2009,
+      primary_stroke: 'Freistil',
+      best_event: '100m Freistil',
+      focus_note: 'Sprinttechnik',
+      team_id: teamId,
+    }),
+  });
+  assert.equal(athleteResponse.status, 201);
+  const athleteBody = await athleteResponse.json();
+  const athleteId = athleteBody.athlete.id;
+
+  const sessionResponse = await fetch(`http://127.0.0.1:${PORT}/sessions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      team_id: teamId,
+      title: 'Force Session',
+      session_date: calculateRangeStart(6),
+      start_time: '17:00',
+      duration_minutes: 75,
+      status: 'geplant',
+      focus_area: 'Technik',
+      load_target: 160,
+    }),
+  });
+  assert.equal(sessionResponse.status, 201);
+  const sessionBody = await sessionResponse.json();
+  const sessionId = sessionBody.session.id;
+
+  const metricResponse = await fetch(`http://127.0.0.1:${PORT}/metrics`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      athlete_id: athleteId,
+      metric_date: calculateRangeStart(-1),
+      metric_type: 'Testwert',
+      value: 12.5,
+      unit: 's',
+    }),
+  });
+  assert.equal(metricResponse.status, 201);
+  const metricBody = await metricResponse.json();
+  const metricId = metricBody.id;
+
+  const deleteConflict = await fetch(`http://127.0.0.1:${PORT}/teams/${teamId}`, { method: 'DELETE' });
+  assert.equal(deleteConflict.status, 409);
+  const conflictBody = await deleteConflict.json();
+  assert.ok(conflictBody.dependencies);
+  assert.ok(conflictBody.dependencies.athlete_count >= 1);
+  assert.ok(conflictBody.dependencies.session_count >= 1);
+
+  const forceDelete = await fetch(`http://127.0.0.1:${PORT}/teams/${teamId}?force=true`, { method: 'DELETE' });
+  assert.equal(forceDelete.status, 204);
+
+  const teamCheck = await fetch(`http://127.0.0.1:${PORT}/teams/${teamId}`);
+  assert.equal(teamCheck.status, 404);
+
+  const sessionCheck = await fetch(`http://127.0.0.1:${PORT}/sessions/${sessionId}`);
+  assert.equal(sessionCheck.status, 404);
+
+  const athleteCheck = await fetch(`http://127.0.0.1:${PORT}/athletes/${athleteId}`);
+  assert.equal(athleteCheck.status, 404);
+
+  const metricCheck = await fetch(`http://127.0.0.1:${PORT}/metrics/${metricId}`);
+  assert.equal(metricCheck.status, 404);
+});

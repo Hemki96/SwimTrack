@@ -267,6 +267,109 @@ function fetchAthlete(athleteId) {
   };
 }
 
+function createAthlete(payload) {
+  const db = getDatabase();
+  const team = db.prepare('SELECT id FROM teams WHERE id = ?').get(payload.team_id);
+  if (!team) {
+    const error = new Error('TEAM_NOT_FOUND');
+    error.code = 'TEAM_NOT_FOUND';
+    throw error;
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO athletes (
+      first_name,
+      last_name,
+      birth_year,
+      primary_stroke,
+      best_event,
+      personal_best,
+      personal_best_unit,
+      focus_note,
+      team_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const result = stmt.run(
+    payload.first_name,
+    payload.last_name,
+    payload.birth_year,
+    payload.primary_stroke,
+    payload.best_event,
+    payload.personal_best ?? null,
+    payload.personal_best_unit ?? null,
+    payload.focus_note ?? null,
+    payload.team_id
+  );
+
+  return fetchAthlete(result.lastInsertRowid);
+}
+
+function updateAthlete(athleteId, payload) {
+  const db = getDatabase();
+  const existing = db.prepare('SELECT id FROM athletes WHERE id = ?').get(athleteId);
+  if (!existing) {
+    return null;
+  }
+
+  if (payload.team_id !== undefined) {
+    const team = db.prepare('SELECT id FROM teams WHERE id = ?').get(payload.team_id);
+    if (!team) {
+      const error = new Error('TEAM_NOT_FOUND');
+      error.code = 'TEAM_NOT_FOUND';
+      throw error;
+    }
+  }
+
+  const allowed = new Set([
+    'first_name',
+    'last_name',
+    'birth_year',
+    'primary_stroke',
+    'best_event',
+    'personal_best',
+    'personal_best_unit',
+    'focus_note',
+    'team_id',
+  ]);
+
+  const assignments = [];
+  const params = [];
+
+  Object.entries(payload || {}).forEach(([key, value]) => {
+    if (allowed.has(key)) {
+      assignments.push(`${key} = ?`);
+      params.push(value);
+    }
+  });
+
+  if (!assignments.length) {
+    return fetchAthlete(athleteId);
+  }
+
+  params.push(athleteId);
+  const sql = `UPDATE athletes SET ${assignments.join(', ')} WHERE id = ?`;
+  db.prepare(sql).run(...params);
+
+  return fetchAthlete(athleteId);
+}
+
+function deleteAthlete(athleteId) {
+  const db = getDatabase();
+  const existing = db.prepare('SELECT id FROM athletes WHERE id = ?').get(athleteId);
+  if (!existing) {
+    return false;
+  }
+
+  const run = db.transaction(() => {
+    db.prepare('DELETE FROM metrics WHERE athlete_id = ?').run(athleteId);
+    db.prepare('DELETE FROM athletes WHERE id = ?').run(athleteId);
+  });
+
+  run();
+  return true;
+}
+
 function fetchSessions({ teamId, status } = {}) {
   const db = getDatabase();
   const filters = [];
@@ -409,6 +512,17 @@ function duplicateSession(sessionId, overrides = {}) {
   return createSession(payload);
 }
 
+function deleteSession(sessionId) {
+  const db = getDatabase();
+  const existing = db.prepare('SELECT id FROM sessions WHERE id = ?').get(sessionId);
+  if (!existing) {
+    return false;
+  }
+
+  const result = db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
+  return result.changes > 0;
+}
+
 function upsertAttendance(sessionId, rows) {
   const db = getDatabase();
   const insert = db.prepare(`
@@ -488,6 +602,94 @@ function fetchMetrics({ teamId, metricType } = {}) {
   return db.prepare(sql).all(...params);
 }
 
+function fetchMetric(metricId) {
+  const db = getDatabase();
+  return (
+    db
+      .prepare(`
+        SELECT m.*, a.first_name, a.last_name, t.name AS team_name
+        FROM metrics m
+        JOIN athletes a ON a.id = m.athlete_id
+        JOIN teams t ON t.id = a.team_id
+        WHERE m.id = ?
+      `)
+      .get(metricId) || null
+  );
+}
+
+function createMetric(payload) {
+  const db = getDatabase();
+  const athlete = db.prepare('SELECT id FROM athletes WHERE id = ?').get(payload.athlete_id);
+  if (!athlete) {
+    const error = new Error('ATHLETE_NOT_FOUND');
+    error.code = 'ATHLETE_NOT_FOUND';
+    throw error;
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO metrics (athlete_id, metric_date, metric_type, value, unit)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+  const result = stmt.run(
+    payload.athlete_id,
+    payload.metric_date,
+    payload.metric_type,
+    payload.value,
+    payload.unit
+  );
+
+  return fetchMetric(result.lastInsertRowid);
+}
+
+function updateMetric(metricId, payload) {
+  const db = getDatabase();
+  const existing = db.prepare('SELECT id FROM metrics WHERE id = ?').get(metricId);
+  if (!existing) {
+    return null;
+  }
+
+  if (payload.athlete_id !== undefined) {
+    const athlete = db.prepare('SELECT id FROM athletes WHERE id = ?').get(payload.athlete_id);
+    if (!athlete) {
+      const error = new Error('ATHLETE_NOT_FOUND');
+      error.code = 'ATHLETE_NOT_FOUND';
+      throw error;
+    }
+  }
+
+  const allowed = new Set(['athlete_id', 'metric_date', 'metric_type', 'value', 'unit']);
+  const assignments = [];
+  const params = [];
+
+  Object.entries(payload || {}).forEach(([key, value]) => {
+    if (allowed.has(key)) {
+      assignments.push(`${key} = ?`);
+      params.push(value);
+    }
+  });
+
+  if (!assignments.length) {
+    return fetchMetric(metricId);
+  }
+
+  params.push(metricId);
+  const sql = `UPDATE metrics SET ${assignments.join(', ')} WHERE id = ?`;
+  db.prepare(sql).run(...params);
+
+  return fetchMetric(metricId);
+}
+
+function deleteMetric(metricId) {
+  const db = getDatabase();
+  const existing = db.prepare('SELECT id FROM metrics WHERE id = ?').get(metricId);
+  if (!existing) {
+    return false;
+  }
+
+  const result = db.prepare('DELETE FROM metrics WHERE id = ?').run(metricId);
+  return result.changes > 0;
+}
+
 function createTeam(payload) {
   const db = getDatabase();
   const stmt = db.prepare(`
@@ -528,22 +730,74 @@ function updateTeam(teamId, payload) {
   return fetchTeam(teamId);
 }
 
+function countTeamDependencies(teamId) {
+  const db = getDatabase();
+  return db
+    .prepare(`
+      SELECT
+        (SELECT COUNT(*) FROM athletes WHERE team_id = ?) AS athlete_count,
+        (SELECT COUNT(*) FROM sessions WHERE team_id = ?) AS session_count,
+        (SELECT COUNT(*) FROM reports WHERE team_id = ?) AS report_count
+    `)
+    .get(teamId, teamId, teamId);
+}
+
+function deleteTeam(teamId, { force = false } = {}) {
+  const db = getDatabase();
+  const existing = db.prepare('SELECT id FROM teams WHERE id = ?').get(teamId);
+  if (!existing) {
+    return { found: false, deleted: false };
+  }
+
+  const dependencies = countTeamDependencies(teamId);
+  const hasDependencies =
+    (dependencies?.athlete_count || 0) > 0 ||
+    (dependencies?.session_count || 0) > 0 ||
+    (dependencies?.report_count || 0) > 0;
+
+  if (hasDependencies && !force) {
+    return { found: true, deleted: false, dependencies };
+  }
+
+  const run = db.transaction(() => {
+    db.prepare('DELETE FROM metrics WHERE athlete_id IN (SELECT id FROM athletes WHERE team_id = ?)').run(teamId);
+    db.prepare('DELETE FROM attendance WHERE session_id IN (SELECT id FROM sessions WHERE team_id = ?)').run(teamId);
+    db.prepare('DELETE FROM sessions WHERE team_id = ?').run(teamId);
+    db.prepare('DELETE FROM athletes WHERE team_id = ?').run(teamId);
+    db.prepare('DELETE FROM reports WHERE team_id = ?').run(teamId);
+    db.prepare('DELETE FROM teams WHERE id = ?').run(teamId);
+  });
+
+  run();
+
+  return { found: true, deleted: true, dependencies };
+}
+
 module.exports = {
   fetchDashboardKpis,
   fetchTeams,
   fetchTeam,
   fetchAthletes,
   fetchAthlete,
+  createAthlete,
+  updateAthlete,
+  deleteAthlete,
   fetchSessions,
   fetchSession,
   updateSession,
   createSession,
+  deleteSession,
   duplicateSession,
   upsertAttendance,
   fetchReports,
   fetchLatestNote,
   saveNote,
   fetchMetrics,
+  fetchMetric,
+  createMetric,
+  updateMetric,
+  deleteMetric,
   createTeam,
   updateTeam,
+  deleteTeam,
 };
