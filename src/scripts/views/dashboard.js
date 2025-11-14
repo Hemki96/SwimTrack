@@ -51,11 +51,16 @@ function buildAlertItems(data) {
 
   const attendanceRates = data.attendance
     .map(({ attendance }) => {
-      const total = attendance.length || 1;
-      const present = attendance.filter((item) => item.status === "anwesend").length;
-      return present / total;
+      const recorded = attendance.filter((item) =>
+        typeof item.status === "string" && item.status.trim().length > 0
+      );
+      if (!recorded.length) {
+        return null;
+      }
+      const present = recorded.filter((item) => item.status === "anwesend").length;
+      return present / recorded.length;
     })
-    .filter((rate) => Number.isFinite(rate));
+    .filter((rate) => rate !== null && Number.isFinite(rate));
   const averageRate = attendanceRates.length
     ? attendanceRates.reduce((sum, rate) => sum + rate, 0) / attendanceRates.length
     : 1;
@@ -102,19 +107,25 @@ async function loadDashboardData(range = 30) {
     }
     return sessionDate >= start && sessionDate <= now;
   });
-  const recentSessions = sessionsInRange.slice(0, 8);
   const attendanceDetails = await Promise.all(
-    recentSessions.map((session) => api.getSession(session.id))
+    sessionsInRange.map((session) => api.getSession(session.id))
   );
 
   const enriched = {
     dashboard,
     sessions,
     sessions_in_range: sessionsInRange,
-    attendance: attendanceDetails.map((entry) => ({
-      session: entry.session,
-      attendance: entry.attendance,
-    })),
+    attendance: attendanceDetails
+      .map((entry) => ({
+        session: entry.session,
+        attendance: entry.attendance,
+      }))
+      .filter((entry) =>
+        Array.isArray(entry.attendance) &&
+        entry.attendance.some(
+          (item) => typeof item.status === "string" && item.status.trim().length > 0
+        )
+      ),
   };
   return setCached(cacheKey, enriched);
 }
@@ -222,9 +233,14 @@ function renderAttendance(container, attendance) {
   }
   container.innerHTML = attendance
     .map(({ session, attendance: entries }) => {
-      const total = entries.length || 1;
-      const present = entries.filter((item) => item.status === "anwesend").length;
-      const rate = Math.round((present / total) * 100);
+      const recorded = entries.filter(
+        (item) => typeof item.status === "string" && item.status.trim().length > 0
+      );
+      if (!recorded.length) {
+        return "";
+      }
+      const present = recorded.filter((item) => item.status === "anwesend").length;
+      const rate = Math.round((present / recorded.length) * 100);
       return `
         <div class="flex items-center justify-between rounded-lg border border-border-light bg-background-light px-4 py-3 text-sm dark:border-border-dark dark:bg-background-dark">
           <div>
@@ -235,6 +251,7 @@ function renderAttendance(container, attendance) {
         </div>
       `;
     })
+    .filter(Boolean)
     .join("");
 }
 
