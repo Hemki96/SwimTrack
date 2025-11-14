@@ -1,9 +1,9 @@
 services:
   - type: web
     name: swimtrack-app
-    runtime: python
+    runtime: node
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: npm install
     startCommand: ./render_start.sh
     envVars:
       - key: SWIMTRACK_DB_PATH
