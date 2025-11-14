@@ -1,4 +1,4 @@
-const repositories = require('../repositories');
+const dashboardService = require('../services/dashboard');
 
 function getDashboard(req, res) {
   try {
@@ -9,13 +9,8 @@ function getDashboard(req, res) {
       return;
     }
 
-    const payload = repositories.fetchDashboardKpis({ rangeDays });
-    const note = repositories.fetchLatestNote();
-    if (note) {
-      payload.coach_note = note;
-    }
-
-    res.json(payload);
+    const overview = dashboardService.getDashboardOverview({ rangeDays });
+    res.json(overview);
   } catch (error) {
     res.status(500).json({ detail: 'Dashboard konnte nicht geladen werden', error: error.message });
   }

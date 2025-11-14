@@ -1,4 +1,4 @@
-const repositories = require('../repositories');
+const metricsService = require('../services/metrics');
 const { createHttpError } = require('../utils/httpError');
 
 function listMetrics(req, res, next) {
@@ -10,7 +10,7 @@ function listMetrics(req, res, next) {
     if (req.query.metric_type !== undefined) {
       filters.metricType = req.query.metric_type;
     }
-    res.json(repositories.fetchMetrics(filters));
+    res.json(metricsService.listMetrics(filters));
   } catch (error) {
     next(error);
   }
@@ -18,7 +18,7 @@ function listMetrics(req, res, next) {
 
 function getMetric(req, res, next) {
   try {
-    const metric = repositories.fetchMetric(req.params.metricId);
+    const metric = metricsService.getMetric(req.params.metricId);
     if (!metric) {
       next(createHttpError(404, 'Metrik nicht gefunden'));
       return;
@@ -31,7 +31,7 @@ function getMetric(req, res, next) {
 
 function createMetric(req, res, next) {
   try {
-    const created = repositories.createMetric(req.body);
+    const created = metricsService.createMetric(req.body);
     res.status(201).json(created);
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ function createMetric(req, res, next) {
 
 function updateMetric(req, res, next) {
   try {
-    const updated = repositories.updateMetric(req.params.metricId, req.body || {});
+    const updated = metricsService.updateMetric(req.params.metricId, req.body || {});
     if (!updated) {
       next(createHttpError(404, 'Metrik nicht gefunden'));
       return;
@@ -53,7 +53,7 @@ function updateMetric(req, res, next) {
 
 function deleteMetric(req, res, next) {
   try {
-    const deleted = repositories.deleteMetric(req.params.metricId);
+    const deleted = metricsService.deleteMetric(req.params.metricId);
     if (!deleted) {
       next(createHttpError(404, 'Metrik nicht gefunden'));
       return;
