@@ -370,7 +370,7 @@ function deleteAthlete(athleteId) {
   return true;
 }
 
-function fetchSessions({ teamId, status } = {}) {
+function fetchSessions({ teamId, status, includeAttendance } = {}) {
   const db = getDatabase();
   const filters = [];
   const params = [];
@@ -394,7 +394,79 @@ function fetchSessions({ teamId, status } = {}) {
     ORDER BY s.session_date DESC, s.start_time DESC
   `;
 
-  return db.prepare(sql).all(...params);
+  const sessions = db.prepare(sql).all(...params);
+
+  if (!includeAttendance || !sessions.length) {
+    return sessions;
+  }
+
+  const sessionIds = sessions.map((session) => session.id);
+  const teamIds = Array.from(new Set(sessions.map((session) => session.team_id)));
+
+  const attendanceBySession = new Map();
+  if (sessionIds.length) {
+    const placeholders = sessionIds.map(() => '?').join(', ');
+    const attendanceRows = db
+      .prepare(
+        `
+        SELECT session_id, athlete_id, status, note
+        FROM attendance
+        WHERE session_id IN (${placeholders})
+      `,
+      )
+      .all(...sessionIds);
+
+    attendanceRows.forEach((row) => {
+      if (!attendanceBySession.has(row.session_id)) {
+        attendanceBySession.set(row.session_id, new Map());
+      }
+      attendanceBySession.get(row.session_id).set(row.athlete_id, {
+        status: row.status ?? null,
+        note: row.note ?? null,
+      });
+    });
+  }
+
+  const athletesByTeam = new Map();
+  if (teamIds.length) {
+    const placeholders = teamIds.map(() => '?').join(', ');
+    const athleteRows = db
+      .prepare(
+        `
+        SELECT id, first_name, last_name, team_id
+        FROM athletes
+        WHERE team_id IN (${placeholders})
+        ORDER BY last_name, first_name
+      `,
+      )
+      .all(...teamIds);
+
+    athleteRows.forEach((row) => {
+      if (!athletesByTeam.has(row.team_id)) {
+        athletesByTeam.set(row.team_id, []);
+      }
+      athletesByTeam.get(row.team_id).push(row);
+    });
+  }
+
+  return sessions.map((session) => {
+    const teamAthletes = athletesByTeam.get(session.team_id) || [];
+    const sessionAttendance = attendanceBySession.get(session.id) || new Map();
+
+    return {
+      ...session,
+      attendance: teamAthletes.map((athlete) => {
+        const record = sessionAttendance.get(athlete.id) || {};
+        return {
+          id: athlete.id,
+          first_name: athlete.first_name,
+          last_name: athlete.last_name,
+          status: record.status ?? null,
+          note: record.note ?? null,
+        };
+      }),
+    };
+  });
 }
 
 function fetchSession(sessionId) {
