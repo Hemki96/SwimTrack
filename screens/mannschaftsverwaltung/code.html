@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="dark" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Teams &amp; Kader</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex h-screen">
+<aside class="w-72 bg-white dark:bg-background-dark border-r border-gray-200 dark:border-gray-800 flex flex-col p-4">
+<div class="flex flex-col gap-4 flex-grow">
+<div class="flex gap-3 items-center px-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC38cH041plWX-2aif1OQePTN8XiR0MyjyPYtv-rfMkPRlQOHSUWB33UjML-1Ksw4LJ6UgfnTdNGk5TEEra9asoHZ-cicfkBGiPIxsSyw-ZvPbzQbhPk7dG9DkbgCUVHA1y5m-noMuIU_aiiitOWSewN074bsi7jyuOuov8akXzwftnNbzW_AC63rFB1SoIGQFfjqo_1w_ueR3gVN2BN_6x8h3nGP_xwf46vHdN2pzlFdXo6hlwiQq6cX0UMQddsh_k_jDVlwNwgK4");'></div>
+<div class="flex flex-col">
+<h1 class="text-gray-900 dark:text-white text-base font-medium leading-normal">Max Mustermann</h1>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Cheftrainer</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 mt-6">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">dashboard</span>
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">calendar_month</span>
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Trainingspläne</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20" href="#">
+<span class="material-symbols-outlined text-primary">groups</span>
+<p class="text-primary text-sm font-bold leading-normal">Mannschaften</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">person</span>
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Athleten</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">analytics</span>
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Analyse</p>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">settings</span>
+<p class="text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal">Einstellungen</p>
+</a>
+<a class="flex w-full cursor-pointer items-center gap-3 h-10 px-3 rounded-lg text-gray-700 dark:text-gray-300 text-sm font-medium leading-normal hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">logout</span>
+<span class="truncate">Abmelden</span>
+</a>
+</div>
+</aside>
+<main class="flex-1 p-6 lg:p-8 overflow-y-auto bg-white dark:bg-background-dark/50">
+<div class="flex flex-col gap-8 max-w-7xl mx-auto">
+<div class="flex justify-between items-center">
+<div class="flex flex-col gap-1">
+<h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Teams &amp; Kader</h1>
+<p class="text-gray-500 dark:text-gray-400">Übersicht und Verwaltung Deiner Mannschaften.</p>
+</div>
+<button class="flex items-center justify-center h-10 px-4 gap-2 rounded-lg bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+<span>Neue Mannschaft</span>
+</button>
+</div>
+<div class="grid grid-cols-1 @[1024px]:grid-cols-2 gap-6">
+<div class="flex flex-col bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-800 rounded-xl">
+<div class="p-6 flex flex-col gap-4 flex-grow">
+<div class="flex items-start justify-between">
+<div>
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">U18-Leistungsgruppe</h2>
+<p class="text-sm text-gray-500 dark:text-gray-400">Jugend, leistungsorientiert</p>
+</div>
+<div class="flex -space-x-2">
+<img alt="Trainer 1" class="inline-block size-8 rounded-full ring-2 ring-background-light dark:ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC38cH041plWX-2aif1OQePTN8XiR0MyjyPYtv-rfMkPRlQOHSUWB33UjML-1Ksw4LJ6UgfnTdNGk5TEEra9asoHZ-cicfkBGiPIxsSyw-ZvPbzQbhPk7dG9DkbgCUVHA1y5m-noMuIU_aiiitOWSewN074bsi7jyuOuov8akXzwftnNbzW_AC63rFB1SoIGQFfjqo_1w_ueR3gVN2BN_6x8h3nGP_xwf46vHdN2pzlFdXo6hlwiQq6cX0UMQddsh_k_jDVlwNwgK4"/>
+</div>
+</div>
+<div class="grid grid-cols-1 @[400px]:grid-cols-2 gap-x-4 gap-y-3 text-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-500 text-lg">badge</span>
+<span class="text-gray-700 dark:text-gray-300">Max Mustermann</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-500 text-lg">schedule</span>
+<span class="text-gray-700 dark:text-gray-300">Mo, Mi, Fr 17:00-19:00</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6">
+<h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Kennzahlen (letzte 4 Wochen)</h3>
+<div class="grid grid-cols-3 gap-4 text-center bg-white dark:bg-gray-900/50 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
+<div>
+<p class="text-xl font-bold text-primary">4.2 km</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Ø Umfang</p>
+</div>
+<div>
+<p class="text-xl font-bold text-primary">92%</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Anwesenheit</p>
+</div>
+<div>
+<p class="text-xl font-bold text-primary">12</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Einheiten</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between gap-2 p-4 border-t border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/20">
+<div class="text-sm">Aktionen:</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Trainingskalender öffnen">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Auswertung Mannschaft">
+<span class="material-symbols-outlined text-lg">analytics</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Athletenliste anzeigen/ändern">
+<span class="material-symbols-outlined text-lg">groups</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-800 rounded-xl">
+<div class="p-6 flex flex-col gap-4 flex-grow">
+<div class="flex items-start justify-between">
+<div>
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Nachwuchsteam</h2>
+<p class="text-sm text-gray-500 dark:text-gray-400">Kinder, Grundlagen</p>
+</div>
+<div class="flex -space-x-2">
+<img alt="Trainer 2" class="inline-block size-8 rounded-full ring-2 ring-background-light dark:ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB47C9ypj075ZoNmvSp0r0bgOh50FC9evU5qP8hygVtb0JFl2JmuP5rz9ble5VVA2fxEC-ZB-gj8cAb6yHMCLA9bpE97LB5aWxSeeInZG3KcWSznfyhSabYhUk33XjP0FlAgu3vY8eumTGD-J_CxP-cteE0OzDYG5lgbQSQwIEdqi_bNcdp6KBU7asJFElOCepCW_fXu5LmILAZnqy3Wpq55DGdsgqw0H1hWvSbA6y-aHQ33RGpAHI-Q3DXqJinS575Y-lzLp5BCfE"/>
+</div>
+</div>
+<div class="grid grid-cols-1 @[400px]:grid-cols-2 gap-x-4 gap-y-3 text-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-500 text-lg">badge</span>
+<span class="text-gray-700 dark:text-gray-300">Erika Mustermann</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-500 text-lg">schedule</span>
+<span class="text-gray-700 dark:text-gray-300">Di, Do 16:00-17:00</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6">
+<h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Kennzahlen (letzte 4 Wochen)</h3>
+<div class="grid grid-cols-3 gap-4 text-center bg-white dark:bg-gray-900/50 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
+<div>
+<p class="text-xl font-bold text-primary">2.1 km</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Ø Umfang</p>
+</div>
+<div>
+<p class="text-xl font-bold text-primary">85%</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Anwesenheit</p>
+</div>
+<div>
+<p class="text-xl font-bold text-primary">8</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Einheiten</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between gap-2 p-4 border-t border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/20">
+<div class="text-sm">Aktionen:</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Trainingskalender öffnen">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Auswertung Mannschaft">
+<span class="material-symbols-outlined text-lg">analytics</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Athletenliste anzeigen/ändern">
+<span class="material-symbols-outlined text-lg">groups</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-800 rounded-xl">
+<div class="p-6 flex flex-col gap-4 flex-grow">
+<div class="flex items-start justify-between">
+<div>
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Masters</h2>
+<p class="text-sm text-gray-500 dark:text-gray-400">Erwachsene, Breitensport</p>
+</div>
+<div class="flex -space-x-2">
+<img alt="Trainer 1" class="inline-block size-8 rounded-full ring-2 ring-background-light dark:ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC38cH041plWX-2aif1OQePTN8XiR0MyjyPYtv-rfMkPRlQOHSUWB33UjML-1Ksw4LJ6UgfnTdNGk5TEEra9asoHZ-cicfkBGiPIxsSyw-ZvPbzQbhPk7dG9DkbgCUVHA1y5m-noMuIU_aiiitOWSewN074bsi7jyuOuov8akXzwftnNbzW_AC63rFB1SoIGQFfjqo_1w_ueR3gVN2BN_6x8h3nGP_xwf46vHdN2pzlFdXo6hlwiQq6cX0UMQddsh_k_jDVlwNwgK4"/>
+<img alt="Trainer 2" class="inline-block size-8 rounded-full ring-2 ring-background-light dark:ring-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6cH5o3R_Cg_24PL6gkHF4yUpsRXVGExyanbav1rF2bb4q_0ankp-vbG5sYmDy7nmjE0blN5tLIGnO5wI2w02g56VYCXCv5UgJ5h9uF_f0iMoxZR_PPts_A85mdK0b1YwFizrCqU75TaSsYLkLo2tPzblTU2NGhKZCp5vPMcPRiVd_zjawTL53hC-Dz1sBBvk8BIxIr4F_yuApyWu2EK8wrSwTgyA_wVZUozeiU84hJhcuLUo5ozBrPVKTxvYT6EfXYREdcR44AjE"/>
+</div>
+</div>
+<div class="grid grid-cols-1 @[400px]:grid-cols-2 gap-x-4 gap-y-3 text-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-500 text-lg">badge</span>
+<span class="text-gray-700 dark:text-gray-300">Team</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-500 text-lg">schedule</span>
+<span class="text-gray-700 dark:text-gray-300">Di 20:00-21:30, Do 19:30-21:00</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6">
+<h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Kennzahlen (letzte 4 Wochen)</h3>
+<div class="grid grid-cols-3 gap-4 text-center bg-white dark:bg-gray-900/50 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
+<div>
+<p class="text-xl font-bold text-primary">3.5 km</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Ø Umfang</p>
+</div>
+<div>
+<p class="text-xl font-bold text-primary">78%</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Anwesenheit</p>
+</div>
+<div>
+<p class="text-xl font-bold text-primary">8</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Einheiten</p>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between gap-2 p-4 border-t border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/20">
+<div class="text-sm">Aktionen:</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Trainingskalender öffnen">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Auswertung Mannschaft">
+<span class="material-symbols-outlined text-lg">analytics</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Athletenliste anzeigen/ändern">
+<span class="material-symbols-outlined text-lg">groups</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

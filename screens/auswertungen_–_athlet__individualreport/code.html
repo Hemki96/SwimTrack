@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Individualreport - Anna Schmidt</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="relative flex min-h-screen w-full">
+<!-- SideNavBar -->
+<aside class="flex w-64 flex-col bg-[#111a22] p-4 text-white">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar for Max Mustermann" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA6C0FfNQVW9vFKiT08Xa7q_foEyNXtN8tQhNwCcU-H_a6gnlkEJKC0OqNMQnqd0mopy62RdcCa4TKY274D-senz4fvCLULvPeAlk42U-poNgiXYJ170Sa3pfLvRYbBhxctzdy085LZohrXgWPThmVYwP_h4zc4CGc2lbqABnmx7m7O1MbbAVzkuIsVCgF0978RmwNta8lO2cRmXsrvfTrrEc8a4cXQ5EIPvfSPY1oEWYg3krR17rQaOAGMwOIxdFrpCR7x6TUDlRQ");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-medium leading-normal">Max Mustermann</h1>
+<p class="text-[#92adc9] text-sm font-normal leading-normal">Head Coach</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<p class="text-sm font-medium leading-normal">Team</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<p class="text-sm font-medium leading-normal">Calendar</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#233648]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">monitoring</span>
+<p class="text-sm font-medium leading-normal">Reports</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+</nav>
+</div>
+<div class="mt-auto flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<p class="text-sm font-medium leading-normal">Help</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Logout</p>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto">
+<div class="p-6 sm:p-8 lg:p-10">
+<!-- PageHeading & Avatar -->
+<div class="flex flex-wrap justify-between gap-4 items-start">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-16 shrink-0" data-alt="Avatar of Anna Schmidt" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCOVuBN-LTf-jjPNSwJ2NBXHs1FptcvALaZcr7zwzpWrIkBDUYZLQQ4FoV0LnYelJ0e2m-mQXr25_Pjl2SuV_wyA7EiOD2D9_K8bwF_kqx3LvLgKLMoyyncgejikC0lkV-uATjSCKUvEGBbpSdtSI4gknn80xAhg6xSbtYmFN4a_np5KP_oUZcovMeyqd-ftF-dOL79-bm7EIL5bBcVD11R6eJlbDjEddJqFpzv3ZEmFE2lSCFzbg61MQJRnihP_3dcZYYvEjJY0SM");'></div>
+<div class="flex min-w-72 flex-col gap-1">
+<p class="text-gray-900 dark:text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">Individualreport for Anna Schmidt</p>
+<p class="text-gray-500 dark:text-[#92adc9] text-base font-normal leading-normal">View and analyze the training performance of the athlete.</p>
+</div>
+</div>
+</div>
+<!-- ToolBar & Chips -->
+<div class="flex flex-wrap items-center justify-between gap-4 mt-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+<div class="flex gap-2 sm:gap-3 overflow-x-auto">
+<div class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-primary text-white pl-4 pr-4">
+<p class="text-sm font-medium leading-normal">Last 4 Weeks</p>
+</div>
+<div class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-gray-200 dark:bg-[#233648] hover:bg-gray-300 dark:hover:bg-gray-600 pl-4 pr-4">
+<p class="text-gray-800 dark:text-white text-sm font-medium leading-normal">Last 3 Months</p>
+</div>
+<div class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-gray-200 dark:bg-[#233648] hover:bg-gray-300 dark:hover:bg-gray-600 pl-4 pr-4">
+<p class="text-gray-800 dark:text-white text-sm font-medium leading-normal">Last 6 Months</p>
+</div>
+<div class="flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-lg bg-gray-200 dark:bg-[#233648] hover:bg-gray-300 dark:hover:bg-gray-600 pl-4 pr-4">
+<p class="text-gray-800 dark:text-white text-sm font-medium leading-normal">Custom Range</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+<span class="material-symbols-outlined">download</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 bg-primary text-white gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-4">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 20px;">print</span>
+<span class="truncate">Print Report</span>
+</button>
+</div>
+</div>
+<!-- Section: Training Volume -->
+<section>
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pt-8 pb-4">Training Volume &amp; Comparison</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-[#1C2835] p-6 rounded-xl shadow-sm">
+<div class="flex items-center justify-between">
+<h3 class="text-base font-medium text-gray-600 dark:text-gray-300">Total Sessions</h3>
+<span class="material-symbols-outlined text-gray-400">fitness_center</span>
+</div>
+<p class="text-4xl font-bold mt-2 text-gray-900 dark:text-white">14</p>
+<p class="text-sm text-green-500 mt-1">+5% vs. Team Average</p>
+</div>
+<div class="bg-white dark:bg-[#1C2835] p-6 rounded-xl shadow-sm">
+<div class="flex items-center justify-between">
+<h3 class="text-base font-medium text-gray-600 dark:text-gray-300">Total Hours</h3>
+<span class="material-symbols-outlined text-gray-400">timer</span>
+</div>
+<p class="text-4xl font-bold mt-2 text-gray-900 dark:text-white">21.5h</p>
+<p class="text-sm text-green-500 mt-1">+8% vs. Team Average</p>
+</div>
+<div class="bg-white dark:bg-[#1C2835] p-6 rounded-xl shadow-sm">
+<div class="flex items-center justify-between">
+<h3 class="text-base font-medium text-gray-600 dark:text-gray-300">Total Distance</h3>
+<span class="material-symbols-outlined text-gray-400">pool</span>
+</div>
+<p class="text-4xl font-bold mt-2 text-gray-900 dark:text-white">56km</p>
+<p class="text-sm text-red-500 mt-1">-2% vs. Team Average</p>
+</div>
+</div>
+</section>
+<!-- Section: Attendance & Reliability -->
+<section>
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pt-8 pb-4">Attendance &amp; Reliability</h2>
+<div class="bg-white dark:bg-[#1C2835] p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-semibold text-gray-800 dark:text-gray-100">October 2023</h3>
+<div class="flex items-center gap-4 text-sm">
+<div class="flex items-center gap-2"><div class="size-3 rounded-sm bg-green-500"></div>Attended</div>
+<div class="flex items-center gap-2"><div class="size-3 rounded-sm bg-yellow-500"></div>Excused</div>
+<div class="flex items-center gap-2"><div class="size-3 rounded-sm bg-red-500"></div>Absent</div>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 dark:text-gray-400">
+<div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div><div>Su</div>
+<div class="aspect-square"></div>
+<div class="aspect-square"></div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">1</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">2</div>
+<div class="aspect-square bg-red-500/80 rounded-sm flex items-center justify-center text-white font-bold">3</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">4</div>
+<div class="aspect-square">5</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">6</div>
+<div class="aspect-square bg-yellow-500/80 rounded-sm flex items-center justify-center text-white font-bold">7</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">8</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">9</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">10</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">11</div>
+<div class="aspect-square">12</div>
+<!-- More days... -->
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">13</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">14</div>
+<div class="aspect-square bg-red-500/80 rounded-sm flex items-center justify-center text-white font-bold">15</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">16</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">17</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">18</div>
+<div class="aspect-square">19</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">20</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">21</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">22</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">23</div>
+<div class="aspect-square bg-yellow-500/80 rounded-sm flex items-center justify-center text-white font-bold">24</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">25</div>
+<div class="aspect-square">26</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">27</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">28</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">29</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">30</div>
+<div class="aspect-square bg-green-500/80 rounded-sm flex items-center justify-center text-white font-bold">31</div>
+</div>
+</div>
+</section>
+<!-- Section: Performance Development -->
+<section>
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pt-8 pb-4">Performance Development</h2>
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+<div class="lg:col-span-3 bg-white dark:bg-[#1C2835] p-6 rounded-xl shadow-sm">
+<h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Core Discipline: 100m Freestyle</h3>
+<div class="h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+<p class="text-gray-500">Line Chart Placeholder</p>
+</div>
+</div>
+<div class="lg:col-span-2 bg-white dark:bg-[#1C2835] p-6 rounded-xl shadow-sm">
+<h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-4">Personal Bests (Period)</h3>
+<div class="space-y-3">
+<div class="flex justify-between items-baseline">
+<p class="font-medium text-gray-700 dark:text-gray-200">100m Freestyle</p>
+<div class="flex items-baseline gap-2">
+<p class="font-bold text-lg text-primary">01:02.45</p>
+<p class="text-xs text-gray-500">28. Oct</p>
+</div>
+</div>
+<div class="flex justify-between items-baseline">
+<p class="font-medium text-gray-700 dark:text-gray-200">50m Butterfly</p>
+<div class="flex items-baseline gap-2">
+<p class="font-bold text-lg text-primary">00:28.12</p>
+<p class="text-xs text-gray-500">15. Oct</p>
+</div>
+</div>
+<div class="flex justify-between items-baseline">
+<p class="font-medium text-gray-700 dark:text-gray-200">200m IM</p>
+<div class="flex items-baseline gap-2">
+<p class="font-bold text-lg text-primary">02:25.98</p>
+<p class="text-xs text-gray-500">21. Oct</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Coach's Comments -->
+<section>
+<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pt-8 pb-4">Coach's Comments</h2>
+<div class="bg-white dark:bg-[#1C2835] p-6 rounded-xl shadow-sm">
+<textarea class="w-full h-40 p-3 bg-gray-100 dark:bg-[#233648] rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary border-transparent focus:border-transparent" placeholder="Add summary, strengths, development areas and recommendations...">Anna shows great consistency in training. Her freestyle technique has improved significantly, especially the underwater phase. We should focus on improving her turn speed in backstroke over the next weeks.</textarea>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

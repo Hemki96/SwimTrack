@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Einstellungen / Stammdaten</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<div class="flex h-full min-h-screen">
+<!-- SideNavBar -->
+<aside class="flex w-64 flex-col bg-[#111a22] p-4 text-white">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBA-X9ZU4ZS7bJNszX1A8YHsXtX67xLQAcT4H0twOsU9IdQpACIM8mbY9bxZ0Cdpb55PTL9bUy_PX0BifEsEi7IPK40BMPuIED3a8VNu3cpcZ7iyS2Vb4A-fy5DFsaBkloVpFdqUydcAf3ADNJ7L_-yfMA1sHqS4yF_GOmmUOmI5iKE_BNYx1NeDqTw-HLCHRE8quue1PQQELa8qBZTSZwGjPLfA1DidCRQ114HiSmTJGYnDA__Bda4mEyFlK1n2YBVJSuPQk_a-xc");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-medium leading-normal">Max Mustermann</h1>
+<p class="text-[#92adc9] text-sm font-normal leading-normal">Cheftrainer</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#233648]" href="#">
+<span class="material-symbols-outlined fill">group</span>
+<p class="text-white text-sm font-medium leading-normal">Mannschaften</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
+<span class="material-symbols-outlined">pool</span>
+<p class="text-white text-sm font-medium leading-normal">Athleten</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-white text-sm font-medium leading-normal">Trainer</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<p class="text-white text-sm font-medium leading-normal">Standardlisten</p>
+</a>
+</div>
+</div>
+<div class="mt-auto flex flex-col gap-4">
+<button class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
+<span class="truncate">Abmelden</span>
+</button>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<p class="text-white text-sm font-medium leading-normal">Hilfe</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-white text-sm font-medium leading-normal">Einstellungen</p>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-6 lg:p-10">
+<div class="mx-auto max-w-7xl">
+<!-- PageHeading -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+<div class="flex min-w-72 flex-col gap-2">
+<p class="text-zinc-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Mannschaften</p>
+<p class="text-zinc-500 dark:text-[#92adc9] text-base font-normal leading-normal">Verwalten Sie hier alle Schwimmmannschaften.</p>
+</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined">add</span>
+<span class="truncate">Neue Mannschaft</span>
+</button>
+</div>
+<!-- SearchBar -->
+<div class="mb-6">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-zinc-100 dark:bg-[#233648]">
+<div class="text-zinc-400 dark:text-[#92adc9] flex items-center justify-center pl-4">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-zinc-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-zinc-100 dark:bg-[#233648] h-full placeholder:text-zinc-400 dark:placeholder:text-[#92adc9] px-4 pl-2 text-base font-normal leading-normal" placeholder="Mannschaft suchen..." value=""/>
+</div>
+</label>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto @container">
+<div class="overflow-hidden rounded-lg border border-zinc-200 dark:border-[#324d67] bg-white dark:bg-[#111a22]">
+<table class="w-full">
+<thead class="bg-zinc-50 dark:bg-[#192633]">
+<tr>
+<th class="px-4 py-3 text-left text-zinc-600 dark:text-white w-2/5 text-sm font-medium leading-normal">Name</th>
+<th class="px-4 py-3 text-left text-zinc-600 dark:text-white w-1/5 text-sm font-medium leading-normal">Kürzel</th>
+<th class="px-4 py-3 text-left text-zinc-600 dark:text-white w-1/5 text-sm font-medium leading-normal">Anzahl Athleten</th>
+<th class="px-4 py-3 text-left text-zinc-400 dark:text-[#92adc9] w-1/5 text-sm font-medium leading-normal">Aktionen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-t border-zinc-200 dark:border-t-[#324d67]">
+<td class="h-[72px] px-4 py-2 text-zinc-900 dark:text-white text-sm font-normal leading-normal">1. Mannschaft</td>
+<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">M1</td>
+<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">15</td>
+<td class="h-[72px] px-4 py-2">
+<button class="text-primary hover:underline text-sm font-bold leading-normal tracking-[0.015em]">Bearbeiten</button>
+</td>
+</tr>
+<tr class="border-t border-zinc-200 dark:border-t-[#324d67]">
+<td class="h-[72px] px-4 py-2 text-zinc-900 dark:text-white text-sm font-normal leading-normal">Nachwuchsteam</td>
+<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">NW</td>
+<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">22</td>
+<td class="h-[72px] px-4 py-2">
+<button class="text-primary hover:underline text-sm font-bold leading-normal tracking-[0.015em]">Bearbeiten</button>
+</td>
+</tr>
+<tr class="border-t border-zinc-200 dark:border-t-[#324d67]">
+<td class="h-[72px] px-4 py-2 text-zinc-900 dark:text-white text-sm font-normal leading-normal">Masters</td>
+<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">MA</td>
+<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">18</td>
+<td class="h-[72px] px-4 py-2">
+<button class="text-primary hover:underline text-sm font-bold leading-normal tracking-[0.015em]">Bearbeiten</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- SectionHeader for a different section -->
+<div class="mt-12">
+<h2 class="text-zinc-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-zinc-200 dark:border-[#324d67]">Standardlisten</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+<div class="bg-white dark:bg-[#111a22] p-4 rounded-lg border border-zinc-200 dark:border-[#324d67]">
+<h3 class="font-bold text-zinc-900 dark:text-white mb-2">Trainingsarten</h3>
+<p class="text-sm text-zinc-500 dark:text-[#92adc9] mb-4">Verwalten Sie Standard-Trainingsarten wie Technik, Ausdauer oder Sprint.</p>
+<button class="text-primary text-sm font-bold hover:underline">Liste bearbeiten</button>
+</div>
+<div class="bg-white dark:bg-[#111a22] p-4 rounded-lg border border-zinc-200 dark:border-[#324d67]">
+<h3 class="font-bold text-zinc-900 dark:text-white mb-2">Standardstrecken</h3>
+<p class="text-sm text-zinc-500 dark:text-[#92adc9] mb-4">Definieren Sie häufig genutzte Strecken und Distanzen für das Training.</p>
+<button class="text-primary text-sm font-bold hover:underline">Liste bearbeiten</button>
+</div>
+<div class="bg-white dark:bg-[#111a22] p-4 rounded-lg border border-zinc-200 dark:border-[#324d67]">
+<h3 class="font-bold text-zinc-900 dark:text-white mb-2">Standard-Reports</h3>
+<p class="text-sm text-zinc-500 dark:text-[#92adc9] mb-4">Konfigurieren Sie Vorlagen für regelmäßige Trainingsauswertungen.</p>
+<button class="text-primary text-sm font-bold hover:underline">Liste bearbeiten</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>
