@@ -1,0 +1,33 @@
+.layout {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  padding: 2rem 2.5rem 3rem;
+}
+
+.layout__content {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1280px) {
+  .layout {
+    grid-template-columns: 280px 1fr;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .layout {
+    padding: 1.25rem;
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "teams": [
+    {
+      "name": "Leistungsteam A",
+      "short_name": "STA",
+      "level": "Landeskader",
+      "coach": "Mara Keller",
+      "training_days": "Mo, Mi, Fr, Sa",
+      "focus_theme": "Technikpräzision in Start und Wende"
+    },
+    {
+      "name": "Perspektivteam Jugend",
+      "short_name": "PJ",
+      "level": "Nachwuchs",
+      "coach": "Thilo Brand",
+      "training_days": "Di, Do, Sa",
+      "focus_theme": "Grundlagenausdauer & Wasserlage"
+    }
+  ],
+  "athletes": [
+    {
+      "first_name": "Lena",
+      "last_name": "Schmidt",
+      "birth_year": 2006,
+      "primary_stroke": "Freistil",
+      "best_event": "200m Freistil",
+      "personal_best": 119.87,
+      "personal_best_unit": "s",
+      "focus_note": "Wende mit höherer Frequenz",
+      "team_index": 0
+    },
+    {
+      "first_name": "Eva",
+      "last_name": "Roth",
+      "birth_year": 2007,
+      "primary_stroke": "Rücken",
+      "best_event": "100m Rücken",
+      "personal_best": 65.12,
+      "personal_best_unit": "s",
+      "focus_note": "Armzug symmetrisch führen",
+      "team_index": 0
+    },
+    {
+      "first_name": "Mara",
+      "last_name": "Leu",
+      "birth_year": 2005,
+      "primary_stroke": "Schmetterling",
+      "best_event": "200m Schmetterling",
+      "personal_best": 133.24,
+      "personal_best_unit": "s",
+      "focus_note": "Konditionsaufbau für letzte 50m",
+      "team_index": 0
+    },
+    {
+      "first_name": "Nils",
+      "last_name": "Kraft",
+      "birth_year": 2008,
+      "primary_stroke": "Brust",
+      "best_event": "100m Brust",
+      "personal_best": 70.45,
+      "personal_best_unit": "s",
+      "focus_note": "Gleitphase verlängern",
+      "team_index": 1
+    },
+    {
+      "first_name": "Jonas",
+      "last_name": "Herbst",
+      "birth_year": 2009,
+      "primary_stroke": "Freistil",
+      "best_event": "400m Freistil",
+      "personal_best": 270.67,
+      "personal_best_unit": "s",
+      "focus_note": "Atmung stabilisieren",
+      "team_index": 1
+    }
+  ],
+  "sessions": [
+    {
+      "team_index": 0,
+      "title": "Technik-Intensiv",
+      "session_date": "2024-04-15",
+      "start_time": "17:30",
+      "duration_minutes": 110,
+      "status": "geplant",
+      "focus_area": "Starts & Unterwasserphase",
+      "load_target": 230,
+      "load_actual": null,
+      "notes": "Videoanalyse einplanen"
+    },
+    {
+      "team_index": 0,
+      "title": "Intensitätssätze",
+      "session_date": "2024-04-12",
+      "start_time": "17:30",
+      "duration_minutes": 105,
+      "status": "abgeschlossen",
+      "focus_area": "Renntempo 200m",
+      "load_target": 240,
+      "load_actual": 252,
+      "notes": "Abschnitt 3 mit hoher Qualität"
+    },
+    {
+      "team_index": 1,
+      "title": "Ausdauerblöcke",
+      "session_date": "2024-04-14",
+      "start_time": "16:00",
+      "duration_minutes": 90,
+      "status": "gestartet",
+      "focus_area": "Grundlagenausdauer",
+      "load_target": 180,
+      "load_actual": 95,
+      "notes": "Testdurchgang Staffel"
+    },
+    {
+      "team_index": 1,
+      "title": "Technik Parcours",
+      "session_date": "2024-04-10",
+      "start_time": "16:00",
+      "duration_minutes": 85,
+      "status": "abgeschlossen",
+      "focus_area": "Streamline & Atmung",
+      "load_target": 160,
+      "load_actual": 150,
+      "notes": "Stabile Körperspannung"
+    }
+  ],
+  "attendance": [
+    {
+      "session_index": 1,
+      "athlete_index": 0,
+      "status": "anwesend",
+      "note": "Top Fokus"
+    },
+    {
+      "session_index": 1,
+      "athlete_index": 1,
+      "status": "anwesend",
+      "note": "Starker Finish"
+    },
+    {
+      "session_index": 1,
+      "athlete_index": 2,
+      "status": "entschuldigt",
+      "note": "Erkältung"
+    },
+    {
+      "session_index": 3,
+      "athlete_index": 3,
+      "status": "anwesend",
+      "note": "Konzentriert"
+    },
+    {
+      "session_index": 3,
+      "athlete_index": 4,
+      "status": "anwesend",
+      "note": "Tempo halten"
+    }
+  ],
+  "metrics": [
+    {
+      "athlete_index": 0,
+      "metric_date": "2024-03-10",
+      "metric_type": "200m Freistil",
+      "value": 120.40,
+      "unit": "s"
+    },
+    {
+      "athlete_index": 0,
+      "metric_date": "2024-04-02",
+      "metric_type": "200m Freistil",
+      "value": 119.87,
+      "unit": "s"
+    },
+    {
+      "athlete_index": 1,
+      "metric_date": "2024-04-01",
+      "metric_type": "100m Rücken",
+      "value": 65.12,
+      "unit": "s"
+    },
+    {
+      "athlete_index": 3,
+      "metric_date": "2024-03-28",
+      "metric_type": "100m Brust",
+      "value": 71.34,
+      "unit": "s"
+    },
+    {
+      "athlete_index": 3,
+      "metric_date": "2024-04-08",
+      "metric_type": "100m Brust",
+      "value": 70.45,
+      "unit": "s"
+    }
+  ],
+  "reports": [
+    {
+      "team_index": 0,
+      "title": "Leistungsteam März Report",
+      "period_start": "2024-03-01",
+      "period_end": "2024-03-31",
+      "status": "zugestellt",
+      "delivered_on": "2024-04-05"
+    },
+    {
+      "team_index": 1,
+      "title": "Perspektivteam Q1 Überblick",
+      "period_start": "2024-01-01",
+      "period_end": "2024-03-31",
+      "status": "in Bearbeitung",
+      "delivered_on": null
+    }
+  ],
+  "coach_notes": {
+    "body": "Nächste Woche Technikblock mit Videoanalysen ausweiten.",
+    "updated_at": "2024-04-09T10:15:00"
+  }
+}
