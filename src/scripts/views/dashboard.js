@@ -1,47 +1,91 @@
 import { api } from "../api.js";
 import { getCached, setCached, invalidate } from "../state.js";
+import { invalidateSessionsCache } from "./trainings.js";
 
 const KPI_CONFIG = [
   {
     key: "attendance_rate",
     label: "Anwesenheit",
-    format: (value) => `${Math.round(value * 100)}%`,
+    format: (value) => `${Math.round((value || 0) * 100)}%`,
+    tone: "text-primary",
   },
   {
     key: "completed_sessions",
-    label: "Abgeschlossene Einheiten",
-    format: (value) => value,
+    label: "Abgeschlossen",
+    format: (value) => value ?? 0,
+    tone: "text-success",
   },
   {
     key: "in_progress_sessions",
     label: "Gestartet",
-    format: (value) => value,
+    format: (value) => value ?? 0,
+    tone: "text-warning",
   },
   {
     key: "planned_sessions",
     label: "Geplant",
-    format: (value) => value,
+    format: (value) => value ?? 0,
+    tone: "text-text-light-secondary dark:text-text-dark-secondary",
   },
 ];
 
 function formatDate(value) {
   const date = new Date(value);
   return date.toLocaleDateString("de-DE", {
+    weekday: "short",
     day: "2-digit",
     month: "2-digit",
   });
+}
+
+function buildAlertItems(data) {
+  const alerts = [];
+  if ((data.dashboard?.missing_documentations || 0) > 0) {
+    alerts.push({
+      icon: "description",
+      title: `${data.dashboard.missing_documentations} fehlende Dokumentationen`,
+      tone: "text-danger",
+      description: "Dokumentiere offene Einheiten für ein vollständiges Journal.",
+    });
+  }
+
+  const attendanceRates = data.attendance
+    .map(({ attendance }) => {
+      const total = attendance.length || 1;
+      const present = attendance.filter((item) => item.status === "anwesend").length;
+      return present / total;
+    })
+    .filter((rate) => Number.isFinite(rate));
+  const averageRate = attendanceRates.length
+    ? attendanceRates.reduce((sum, rate) => sum + rate, 0) / attendanceRates.length
+    : 1;
+
+  if (averageRate < 0.8) {
+    alerts.push({
+      icon: "trending_down",
+      title: "Anwesenheit unter 80%",
+      tone: "text-warning",
+      description: "Überprüfe die Trainingsbelastung und motiviere dein Team.",
+    });
+  }
+
+  if (!alerts.length) {
+    alerts.push({
+      icon: "verified",
+      title: "Alles im grünen Bereich",
+      tone: "text-success",
+      description: "Keine dringenden Hinweise. Weiter so!",
+    });
+  }
+  return alerts;
 }
 
 async function loadDashboardData() {
   const cached = getCached("dashboard-data");
   if (cached) return cached;
 
-  const [dashboard, sessions] = await Promise.all([
-    api.getDashboard(),
-    api.getSessions(),
-  ]);
-
-  const recentSessions = sessions.slice(0, 5);
+  const [dashboard, sessions] = await Promise.all([api.getDashboard(), api.getSessions()]);
+  const recentSessions = sessions.slice(0, 8);
   const attendanceDetails = await Promise.all(
     recentSessions.map((session) => api.getSession(session.id))
   );
@@ -60,145 +104,338 @@ async function loadDashboardData() {
 function renderKpis(container, data) {
   container.innerHTML = "";
   KPI_CONFIG.forEach((item) => {
-    const value = data[item.key];
-    const element = document.createElement("div");
-    element.className = "kpi-card";
-    element.innerHTML = `
-      <span class="kpi-card__label">${item.label}</span>
-      <span class="kpi-card__value">${item.format(value)}</span>
+    const wrapper = document.createElement("div");
+    wrapper.className = "rounded-xl border border-border-light bg-card-light p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-card dark:border-border-dark dark:bg-card-dark";
+    wrapper.innerHTML = `
+      <p class="text-xs font-semibold uppercase tracking-wide text-text-light-secondary dark:text-text-dark-secondary">${item.label}</p>
+      <p class="mt-4 text-3xl font-semibold ${item.tone}">${item.format(data[item.key])}</p>
     `;
-    container.appendChild(element);
+    container.appendChild(wrapper);
+  });
+}
+
+function sessionStatusPill(status) {
+  const tones = {
+    geplant: "bg-primary/10 text-primary",
+    gestartet: "bg-warning/10 text-warning",
+    abgeschlossen: "bg-success/10 text-success",
+  };
+  return tones[status] || "bg-card-light text-text-light-secondary dark:bg-card-dark dark:text-text-dark-secondary";
+}
+
+function renderUpcoming(container, sessions) {
+  container.innerHTML = "";
+  if (!sessions.length) {
+    container.innerHTML = '<p class="rounded-lg bg-background-light p-4 text-sm text-text-light-secondary dark:bg-background-dark dark:text-text-dark-secondary">Keine Trainingseinheiten im ausgewählten Zeitraum.</p>';
+    return;
+  }
+  sessions.forEach((session) => {
+    const card = document.createElement("article");
+    card.className = "rounded-xl border border-border-light bg-background-light p-4 dark:border-border-dark dark:bg-background-dark";
+    card.innerHTML = `
+      <div class="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-5 lg:items-center">
+        <div class="font-semibold text-text-light-primary dark:text-text-dark-primary">${session.title}</div>
+        <div class="text-text-light-secondary dark:text-text-dark-secondary">${formatDate(session.session_date)} · ${session.start_time?.slice(0, 5) || "—"}</div>
+        <div class="hidden text-text-light-secondary dark:text-text-dark-secondary sm:block">${session.location || "Noch nicht definiert"}</div>
+        <div class="hidden text-text-light-secondary dark:text-text-dark-secondary lg:block">${session.coach || session.team_name}</div>
+        <div class="flex items-center gap-2">
+          <span class="rounded-full px-3 py-1 text-xs font-medium ${sessionStatusPill(session.status)}">${session.status}</span>
+          <span class="text-xs text-text-light-secondary dark:text-text-dark-secondary">${session.focus_area || "kein Fokus"}</span>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderAlerts(container, data) {
+  container.innerHTML = "";
+  const alerts = buildAlertItems(data);
+  alerts.forEach((alert) => {
+    const item = document.createElement("article");
+    item.className = `flex items-start gap-3 rounded-xl border border-border-light bg-background-light p-4 text-sm dark:border-border-dark dark:bg-background-dark ${alert.tone}`;
+    item.innerHTML = `
+      <span class="material-symbols-outlined mt-0.5 text-lg">${alert.icon}</span>
+      <div>
+        <p class="font-semibold">${alert.title}</p>
+        <p class="text-text-light-secondary dark:text-text-dark-secondary">${alert.description}</p>
+      </div>
+    `;
+    container.appendChild(item);
   });
 }
 
 function renderLoadChart(container, dashboard) {
   const max = Math.max(dashboard.total_load_target || 0, dashboard.total_load_actual || 0, 1);
-  const targetWidth = Math.round(((dashboard.total_load_target || 0) / max) * 100);
-  const actualWidth = Math.round(((dashboard.total_load_actual || 0) / max) * 100);
-  container.innerHTML = `
-    <div class="chart-bar">
-      <div class="chart-bar__label">Soll</div>
-      <div class="chart-bar__track">
-        <div class="chart-bar__fill chart-bar__fill--target" style="width:${targetWidth}%"></div>
-      </div>
-      <div class="chart-bar__value">${dashboard.total_load_target || 0} m</div>
-    </div>
-    <div class="chart-bar">
-      <div class="chart-bar__label">Ist</div>
-      <div class="chart-bar__track">
-        <div class="chart-bar__fill chart-bar__fill--actual" style="width:${actualWidth}%"></div>
-      </div>
-      <div class="chart-bar__value">${dashboard.total_load_actual || 0} m</div>
-    </div>
-  `;
+  const variants = [
+    {
+      label: "Soll",
+      value: dashboard.total_load_target || 0,
+      tone: "bg-primary",
+    },
+    {
+      label: "Ist",
+      value: dashboard.total_load_actual || 0,
+      tone: "bg-success",
+    },
+  ];
+  container.innerHTML = variants
+    .map(
+      (variant) => `
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-sm text-text-light-secondary dark:text-text-dark-secondary">
+            <span>${variant.label}</span>
+            <span>${variant.value} m</span>
+          </div>
+          <div class="h-3 rounded-full bg-border-light/40 dark:bg-border-dark/40">
+            <div class="h-3 rounded-full ${variant.tone}" style="width:${Math.round((variant.value / max) * 100)}%"></div>
+          </div>
+        </div>
+      `
+    )
+    .join("");
 }
 
-function renderAttendanceChart(container, attendance) {
-  container.innerHTML = "";
-  const list = document.createElement("ul");
-  list.className = "attendance-spark";
-  attendance.forEach(({ session, attendance: entries }) => {
-    const total = entries.length || 1;
-    const present = entries.filter((item) => item.status === "anwesend").length;
-    const rate = Math.round((present / total) * 100);
-    const item = document.createElement("li");
-    item.innerHTML = `
-      <span class="attendance-spark__label">${formatDate(session.session_date)}</span>
-      <div class="attendance-spark__bar">
-        <div class="attendance-spark__fill" style="width:${rate}%"></div>
-      </div>
-      <span class="attendance-spark__value">${rate}%</span>
-    `;
-    list.appendChild(item);
-  });
-  container.appendChild(list);
+function renderAttendance(container, attendance) {
+  container.innerHTML = attendance
+    .map(({ session, attendance: entries }) => {
+      const total = entries.length || 1;
+      const present = entries.filter((item) => item.status === "anwesend").length;
+      const rate = Math.round((present / total) * 100);
+      return `
+        <div class="flex items-center justify-between rounded-lg border border-border-light bg-background-light px-4 py-3 text-sm dark:border-border-dark dark:bg-background-dark">
+          <div>
+            <p class="font-semibold text-text-light-primary dark:text-text-dark-primary">${session.title}</p>
+            <p class="text-xs text-text-light-secondary dark:text-text-dark-secondary">${formatDate(session.session_date)}</p>
+          </div>
+          <span class="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">${rate}%</span>
+        </div>
+      `;
+    })
+    .join("");
 }
 
-function renderFocusCloud(container, topics) {
+function renderFocus(container, topics) {
   container.innerHTML = "";
   topics.forEach((topic) => {
-    const span = document.createElement("span");
-    span.className = "focus-chip";
-    span.textContent = `${topic.focus_area} (${topic.count})`;
-    container.appendChild(span);
+    const label = topic.focus_area || "Allgemein";
+    const chip = document.createElement("span");
+    chip.className = "rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary";
+    chip.textContent = `${label} (${topic.count})`;
+    container.appendChild(chip);
   });
 }
 
-function renderActivities(container, activities) {
+function renderActivity(container, activities) {
   container.innerHTML = "";
   activities.forEach((activity) => {
-    const li = document.createElement("li");
-    li.className = "activity-item";
-    li.innerHTML = `
-      <span class="activity-item__title">${activity.title}</span>
-      <span class="activity-item__meta">${formatDate(activity.date)} · ${activity.status}</span>
+    const entry = document.createElement("article");
+    entry.className = "rounded-xl border border-border-light bg-background-light px-4 py-3 text-sm shadow-sm dark:border-border-dark dark:bg-background-dark";
+    entry.innerHTML = `
+      <div class="flex items-center justify-between">
+        <p class="font-semibold text-text-light-primary dark:text-text-dark-primary">${activity.title}</p>
+        <span class="text-xs text-text-light-secondary dark:text-text-dark-secondary">${formatDate(activity.date)}</span>
+      </div>
+      <p class="mt-1 text-xs text-text-light-secondary dark:text-text-dark-secondary">${activity.status}</p>
     `;
-    container.appendChild(li);
+    container.appendChild(entry);
   });
 }
 
-function renderSidebar(data) {
-  const upcoming = document.getElementById("upcoming-sessions");
-  const teamFilters = document.getElementById("team-filters");
-  const focusFilters = document.getElementById("focus-filters");
-  const notesField = document.getElementById("coach-notes");
-  const noteFeedback = document.getElementById("save-feedback");
-  if (upcoming) {
-    upcoming.innerHTML = "";
-    data.dashboard.upcoming_sessions.forEach((session) => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <span class="sidebar-list__title">${session.title}</span>
-        <span class="sidebar-list__subtitle">${formatDate(session.session_date)} · ${session.focus_area}</span>
-      `;
-      upcoming.appendChild(li);
+function filterSessions(sessions, filters) {
+  return sessions.filter((session) => {
+    const teamMatch = filters.team === "all" || String(session.team_id || session.teamId) === filters.team;
+    const statusMatch = filters.status === "all" || session.status === filters.status;
+    return teamMatch && statusMatch;
+  });
+}
+
+function renderCoachNoteSection(root, dashboard) {
+  const noteField = root.querySelector("#coach-note-field");
+  const notePreview = root.querySelector("#coach-note-preview");
+  const noteMeta = root.querySelector("#coach-note-updated");
+  if (!noteField || !notePreview || !noteMeta) {
+    return;
+  }
+
+  const note = dashboard?.coach_note;
+  noteField.value = note?.body || "";
+  notePreview.textContent = note?.body || "Noch keine Trainer:innennotiz hinterlegt.";
+  if (note?.updated_at) {
+    const date = new Date(note.updated_at);
+    noteMeta.textContent = `Aktualisiert am ${date.toLocaleString("de-DE")}`;
+  } else {
+    noteMeta.textContent = "Noch keine Notiz gespeichert";
+  }
+}
+
+async function setupQuickCapture(root, refresh) {
+  const trigger = root.querySelector('[data-action="open-quick-capture"]');
+  const dialog = root.querySelector("#quick-capture-dialog");
+  const form = root.querySelector("#quick-capture-form");
+  if (!trigger || !dialog || !form) return;
+
+  const closeButtons = form.querySelectorAll('[data-action="close-quick-capture"]');
+
+  async function populateSessions() {
+    const sessions = await api.getSessions();
+    const select = form.querySelector("select[name='session']");
+    select.innerHTML = "";
+    sessions.forEach((session) => {
+      const option = document.createElement("option");
+      option.value = session.id;
+      option.textContent = `${session.session_date} · ${session.title}`;
+      select.appendChild(option);
     });
   }
-  if (teamFilters) {
-    teamFilters.innerHTML = "";
-    const teams = getCached("teams-cache");
-    if (teams) {
-      teams.forEach((team) => {
-        const button = document.createElement("button");
-        button.className = "chip";
-        button.textContent = team.short_name;
-        button.dataset.teamId = team.id;
-        teamFilters.appendChild(button);
-      });
-    }
-  }
-  if (focusFilters) {
-    focusFilters.innerHTML = "";
-    data.dashboard.focus_topics.forEach((topic) => {
-      const button = document.createElement("button");
-      button.className = "chip chip--outline";
-      button.textContent = topic.focus_area;
-      focusFilters.appendChild(button);
+
+  trigger.addEventListener("click", async () => {
+    await populateSessions();
+    dialog.showModal();
+  });
+
+  closeButtons.forEach((button) => button.addEventListener("click", () => dialog.close()));
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const sessionId = Number(formData.get("session"));
+    const status = formData.get("status");
+    const focus = formData.get("focus");
+    const note = formData.get("note");
+    await api.updateSession(sessionId, {
+      status,
+      focus_area: focus || undefined,
+      notes: note || undefined,
     });
+    dialog.close();
+    form.reset();
+    invalidateSessionsCache();
+    invalidateDashboardCache();
+    await refresh();
+  });
+}
+
+async function setupFilters(root, data) {
+  const teamSelect = root.querySelector("#dashboard-team-filter");
+  const statusSelect = root.querySelector("#dashboard-status-filter");
+  const upcomingContainer = root.querySelector("#dashboard-upcoming");
+
+  const teams = await api.getTeams();
+  teamSelect.innerHTML = '<option value="all">Alle</option>';
+  teams.forEach((team) => {
+    const option = document.createElement("option");
+    option.value = String(team.id);
+    option.textContent = team.short_name || team.name;
+    teamSelect.appendChild(option);
+  });
+
+  let sessions = data.sessions;
+  const filterState = {
+    team: "all",
+    status: "all",
+  };
+
+  function applyFilters() {
+    const filtered = filterSessions(sessions, filterState).slice(0, 6);
+    renderUpcoming(upcomingContainer, filtered);
   }
-  if (notesField) {
-    const note = data.dashboard.coach_note;
-    notesField.value = note ? note.body : "";
-    if (note && noteFeedback) {
-      noteFeedback.textContent = `Letzte Aktualisierung ${formatDate(note.updated_at)}`;
-    }
+
+  teamSelect.addEventListener("change", (event) => {
+    filterState.team = event.target.value;
+    applyFilters();
+  });
+
+  statusSelect.addEventListener("change", (event) => {
+    filterState.status = event.target.value;
+    applyFilters();
+  });
+
+  applyFilters();
+
+  return {
+    updateData(newData) {
+      sessions = newData.sessions;
+      applyFilters();
+    },
+  };
+}
+
+function refreshHeading(root) {
+  const heading = root.querySelector("#dashboard-heading");
+  const date = root.querySelector("#dashboard-date");
+  if (heading) heading.textContent = "Heute im Überblick";
+  if (date) {
+    const now = new Date();
+    date.textContent = now.toLocaleDateString("de-DE", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+    });
   }
 }
 
 export async function renderDashboard(root) {
-  const data = await loadDashboardData();
-  const kpiContainer = root.querySelector("#kpi-grid");
-  const loadChart = root.querySelector("#load-chart");
-  const attendanceChart = root.querySelector("#attendance-chart");
-  const focusCloud = root.querySelector("#focus-cloud");
-  const activityFeed = root.querySelector("#activity-feed");
+  const kpiContainer = root.querySelector("#dashboard-kpis");
+  const loadContainer = root.querySelector("#dashboard-load-chart");
+  const attendanceContainer = root.querySelector("#dashboard-attendance");
+  const focusContainer = root.querySelector("#dashboard-focus");
+  const activityContainer = root.querySelector("#dashboard-activity");
+  const alertsContainer = root.querySelector("#dashboard-alerts");
+  const noteForm = root.querySelector("#coach-note-form");
+  const noteFeedback = root.querySelector("#coach-note-feedback");
+  const noteField = root.querySelector("#coach-note-field");
 
-  renderKpis(kpiContainer, data.dashboard);
-  renderLoadChart(loadChart, data.dashboard);
-  renderAttendanceChart(attendanceChart, data.attendance);
-  renderFocusCloud(focusCloud, data.dashboard.focus_topics);
-  renderActivities(activityFeed, data.dashboard.activities);
-  renderSidebar(data);
+  function applyData(data) {
+    renderKpis(kpiContainer, data.dashboard);
+    renderLoadChart(loadContainer, data.dashboard);
+    renderAttendance(attendanceContainer, data.attendance);
+    renderFocus(focusContainer, data.dashboard.focus_topics || []);
+    renderActivity(activityContainer, data.dashboard.activities || []);
+    renderAlerts(alertsContainer, data);
+    renderCoachNoteSection(root, data.dashboard);
+  }
+
+  const data = await loadDashboardData();
+  refreshHeading(root);
+  applyData(data);
+  const filterController = await setupFilters(root, data);
+
+  if (noteForm && noteField && noteFeedback) {
+    noteForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const noteText = noteField.value.trim();
+      if (!noteText) {
+        noteFeedback.textContent = "Bitte eine Notiz eingeben.";
+        noteFeedback.className = "text-xs text-danger";
+        return;
+      }
+      try {
+        await api.saveNote(noteText);
+        noteFeedback.textContent = "Notiz gespeichert.";
+        noteFeedback.className = "text-xs text-success";
+        invalidateDashboardCache();
+        const refreshed = await loadDashboardData();
+        applyData(refreshed);
+        filterController.updateData(refreshed);
+      } catch (error) {
+        console.error(error);
+        noteFeedback.textContent = "Speichern fehlgeschlagen.";
+        noteFeedback.className = "text-xs text-danger";
+      }
+      setTimeout(() => {
+        noteFeedback.textContent = "";
+        noteFeedback.className = "text-xs text-text-light-secondary dark:text-text-dark-secondary";
+      }, 3000);
+    });
+  }
+
+  await setupQuickCapture(root, async () => {
+    invalidateDashboardCache();
+    const refreshed = await loadDashboardData();
+    applyData(refreshed);
+    filterController.updateData(refreshed);
+  });
 }
 
 export function primeTeamsCache(teams) {

@@ -1,267 +1,109 @@
 <!DOCTYPE html>
-<html class="dark" lang="de"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Athletenprofil - Trainingshistorie &amp; Entwicklung</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-<script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": {
-                            DEFAULT: "#137fec",
-                            "50": "#e8f2fe",
-                            "100": "#d1e5fd",
-                            "200": "#a2cbfb",
-                            "300": "#74b1f9",
-                            "400": "#4597f7",
-                            "500": "#167ff5",
-                            "600": "#137fec",
-                            "700": "#0f66bf",
-                            "800": "#0b4d92",
-                            "900": "#083364"
-                        },
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101922",
-                        "card-dark": "#182431",
-                        "border-light": "#e2e8f0",
-                        "border-dark": "#2e3a48",
-                    },
-                    fontFamily: {
-                        "display": ["Lexend", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "md": "0.5rem",
-                        "lg": "0.75rem",
-                        "xl": "1rem",
-                        "full": "9999px"
-                    },
-                    boxShadow: {
-                       'main': '0px 2px 4px rgba(16, 25, 34, 0.03), 0px 4px 16px rgba(16, 25, 34, 0.04)',
-                    }
-                },
-            },
-        }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .material-symbols-outlined.fill {
-            font-variation-settings: 'FILL' 1;
-        }
-    </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
-<div class="flex min-h-screen">
-<aside class="w-64 shrink-0 bg-[#111a22] p-4 flex-col justify-between hidden lg:flex">
-<div class="flex flex-col gap-4">
-<div class="flex items-center gap-3 p-2">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Profile picture of Max Mustermann" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDn9WcvtDboFmOmoMJZxjYQvnvn6yuSk0ALZVhvoqjT6p0fXmPdIJqWS5FJRsaVIMU5pFHumIG6k3NfSyRiVVtBzA1JbQN4005Fr-Hien66Cmou8Dzbm2xz0e01mQCJgT3YmfSlLzrPKwT3gsgjmp3YVmZ-beG59-t3Jy5kTT5LS2Iz5Bg_X2T-XfgTRZPrsfIjBg1QoPdHH9L6LdVS7Ot9kgcbnzZ-nS6hs5-pMBkKAHRslooDTeGVJKwEnGhqhaGSGp8KqpWnIic");'></div>
-<div class="flex flex-col">
-<h1 class="text-white text-base font-semibold leading-normal">Max Mustermann</h1>
-<p class="text-[#92adc9] text-sm font-normal leading-normal">Cheftrainer</p>
-</div>
-</div>
-<nav class="flex flex-col gap-2 mt-4">
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
-<span class="material-symbols-outlined text-white">dashboard</span>
-<p class="text-white text-sm font-medium leading-normal">Dashboard</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#233648]" href="#">
-<span class="material-symbols-outlined text-white fill">groups</span>
-<p class="text-white text-sm font-medium leading-normal">Athleten</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
-<span class="material-symbols-outlined text-white">list_alt</span>
-<p class="text-white text-sm font-medium leading-normal">Trainingsgruppen</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
-<span class="material-symbols-outlined text-white">calendar_month</span>
-<p class="text-white text-sm font-medium leading-normal">Kalender</p>
-</a>
-</nav>
-</div>
-<div class="flex flex-col gap-1">
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
-<span class="material-symbols-outlined text-white">settings</span>
-<p class="text-white text-sm font-medium leading-normal">Einstellungen</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648] transition-colors" href="#">
-<span class="material-symbols-outlined text-white">help</span>
-<p class="text-white text-sm font-medium leading-normal">Hilfe</p>
-</a>
-</div>
-</aside>
-<main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-<div class="max-w-7xl mx-auto">
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-<div class="flex items-center gap-4">
-<a class="flex items-center justify-center size-10 rounded-full hover:bg-slate-200 dark:hover:bg-card-dark transition-colors" href="#">
-<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">arrow_back</span>
-</a>
-<div>
-<h1 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight">Anna Schmidt</h1>
-<p class="text-slate-500 dark:text-slate-400">Trainingshistorie &amp; Entwicklung</p>
-</div>
-</div>
-<button class="flex items-center justify-center gap-2 min-w-[84px] cursor-pointer rounded-lg h-10 px-4 bg-primary text-white text-sm font-semibold leading-normal hover:bg-primary-600 transition-colors">
-<span class="material-symbols-outlined text-base">edit</span>
-<span class="truncate">Profil bearbeiten</span>
-</button>
-</div>
-<div class="bg-white dark:bg-card-dark rounded-xl shadow-main p-6 @container mb-6 border border-border-light dark:border-border-dark">
-<div class="flex w-full flex-col gap-6 @[520px]:flex-row @[520px]:items-center @[520px]:justify-between">
-<div class="flex items-center gap-6">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 shrink-0" data-alt="Profile picture of Anna Schmidt" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAH-wXE92g5OFoi-SDgXft0XzLIHNStGhJlIJr3mJ8-Mo0L1nYMbtAdJGIpC2x-f41zwVojFuYgK-IFk92kfVF3r_051jeuHheiFFKd8iuJLJMN2uRUQXUahZDfPC88Cxt2moL262x8z5g3wvhiC_3h9mB1tCkaOvFDekM4z932n2B6s__6lDBOunZLPKFPbLg5adCWduiGSiGrsKKxRwBXRofsKEs6vGHYSzhWVxb8W9G2AEBJyka1knTFS1xSEG4GaBbs9YYiTFc");'></div>
-<div class="flex flex-col justify-center">
-<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Jahrgang: <span class="font-medium text-slate-700 dark:text-slate-300">2008</span></p>
-<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal mt-1">Mannschaften:</p>
-<div class="flex flex-wrap gap-2 mt-2">
-<div class="flex h-7 items-center justify-center gap-x-2 rounded-full bg-primary-50 dark:bg-primary-900/50 px-3">
-<p class="text-primary-700 dark:text-primary-200 text-sm font-medium leading-normal">LG1</p>
-</div>
-<div class="flex h-7 items-center justify-center gap-x-2 rounded-full bg-primary-50 dark:bg-primary-900/50 px-3">
-<p class="text-primary-700 dark:text-primary-200 text-sm font-medium leading-normal">Kaderteam</p>
-</div>
-</div>
-</div>
-</div>
-<div class="flex flex-col justify-center gap-2">
-<h3 class="text-slate-500 dark:text-slate-400 text-base font-normal">Hauptstrecken / Lagen</h3>
-<div class="flex gap-2 flex-wrap">
-<div class="flex h-8 items-center justify-center gap-x-2 rounded-md bg-slate-100 dark:bg-background-dark px-3">
-<p class="text-slate-700 dark:text-slate-200 text-sm font-medium leading-normal">100m Freistil</p>
-</div>
-<div class="flex h-8 items-center justify-center gap-x-2 rounded-md bg-slate-100 dark:bg-background-dark px-3">
-<p class="text-slate-700 dark:text-slate-200 text-sm font-medium leading-normal">200m Rücken</p>
-</div>
-<div class="flex h-8 items-center justify-center gap-x-2 rounded-md bg-slate-100 dark:bg-background-dark px-3">
-<p class="text-slate-700 dark:text-slate-200 text-sm font-medium leading-normal">50m Schmetterling</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-<div class="lg:col-span-3 bg-white dark:bg-card-dark rounded-xl shadow-main p-6 border border-border-light dark:border-border-dark">
-<h2 class="text-slate-900 dark:text-white text-xl font-semibold">Trainingsumfang &amp; Anwesenheit</h2>
-<div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-<div class="flex flex-col gap-4">
-<div class="grid grid-cols-2 gap-4">
-<div class="bg-slate-50 dark:bg-background-dark rounded-lg p-4 border border-border-light dark:border-border-dark">
-<p class="text-slate-500 dark:text-slate-400 text-sm mb-1">Gesamt-Trainings</p>
-<p class="text-slate-900 dark:text-white text-3xl font-bold">128</p>
-</div>
-<div class="bg-slate-50 dark:bg-background-dark rounded-lg p-4 border border-border-light dark:border-border-dark">
-<p class="text-slate-500 dark:text-slate-400 text-sm mb-1">Gesamt-Stunden</p>
-<p class="text-slate-900 dark:text-white text-3xl font-bold">192h</p>
-</div>
-</div>
-<div class="bg-slate-50 dark:bg-background-dark rounded-lg p-4 border border-border-light dark:border-border-dark">
-<p class="text-slate-500 dark:text-slate-400 text-sm mb-1">Anwesenheitsquote</p>
-<p class="text-green-500 text-3xl font-bold">94%</p>
-</div>
-</div>
-<div class="md:col-span-1 lg:col-span-3 bg-slate-50 dark:bg-background-dark rounded-lg p-4 min-h-[200px] flex items-center justify-center border border-border-light dark:border-border-dark">
-<img class="w-full h-auto object-contain max-h-52" data-alt="Bar chart showing training sessions per month from January to June" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1o1X_sJG9VB_cQwJ4yCyP4_j84LQ0GYo6i_NiiDgyhih2nBI6Pa-kCIbzKk8vV1lR1qg0uG5LXKmAq7gOrwiyvSKsa80QIzBICFZgayKCXhBAp1-rhHg_yB_80nkj6D6tef80thLteuj0ij3oqAMpuWQwyR3iWmIGMsmqyXMhGQGsFMz1PPPOSf7hY4LzWQZuLStn0ADRqtIPW4ofek_bKtc3WHEvAnkfzoor2lqrLYqWhE3D1RZDUTEEbxkwre6b-AIksGwntbs"/>
-</div>
-</div>
-</div>
-<div class="lg:col-span-2 bg-white dark:bg-card-dark rounded-xl shadow-main p-6 border border-border-light dark:border-border-dark">
-<div class="flex flex-wrap justify-between items-center gap-2 mb-4">
-<h2 class="text-slate-900 dark:text-white text-xl font-semibold">Leistungsverlauf</h2>
-<div class="relative">
-<select class="appearance-none bg-slate-100 dark:bg-background-dark text-slate-700 dark:text-slate-200 text-sm font-medium rounded-md h-9 pl-3 pr-8 border border-slate-300 dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-<option>100m Freistil</option>
-<option>200m Rücken</option>
-<option>50m Schmetterling</option>
-</select>
-<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none">expand_more</span>
-</div>
-</div>
-<div class="bg-slate-50 dark:bg-background-dark rounded-lg p-4 min-h-[200px] flex items-center justify-center border border-border-light dark:border-border-dark">
-<img class="w-full h-auto object-contain max-h-60" data-alt="Line chart showing performance development for 100m freestyle over 5 competitions" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApHhwycwIAaYVHajUwzIT7RLglRXQXsB_-A0y47ZbA6Lrj7AGeVCRsJA_EYedUKK4ljSgi_CZqHCew9bKT6cEfHrd40h1Qha_yccs6OQD96YZ_yAj5okTxFzWSqbhRucd0SYqMfZ_BMQRRh2k2zkKr1i0u6oVzEPMslC0UzNXhlVohqsM-RaRj0fktSnqA829V8znBeZQpZ6JXWFHwPmQcmqJSXH75TttNZMCPlXfZUYDWj9GgjpqjP2W61QO7o_V3lIJcGZ3JL40"/>
-</div>
-<h3 class="text-slate-900 dark:text-white text-lg font-semibold mt-6 mb-3">Letzte 5 gemessene Zeiten</h3>
-<div class="overflow-x-auto">
-<table class="w-full text-left text-sm">
-<thead class="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-background-dark">
-<tr>
-<th class="px-4 py-3 font-medium rounded-l-md" scope="col">Datum</th>
-<th class="px-4 py-3 font-medium" scope="col">Strecke</th>
-<th class="px-4 py-3 font-medium" scope="col">Zeit</th>
-<th class="px-4 py-3 font-medium rounded-r-md" scope="col">Event</th>
-</tr>
-</thead>
-<tbody class="text-slate-700 dark:text-slate-300">
-<tr class="border-b border-border-light dark:border-border-dark">
-<td class="px-4 py-3">23.06.2023</td>
-<td class="px-4 py-3">100m Freistil</td>
-<td class="px-4 py-3 font-semibold text-green-500">0:58.10 <span class="text-xs font-medium text-green-600 dark:text-green-400">(PB)</span></td>
-<td class="px-4 py-3">Bezirksmeisterschaft</td>
-</tr>
-<tr class="border-b border-border-light dark:border-border-dark">
-<td class="px-4 py-3">15.05.2023</td>
-<td class="px-4 py-3">100m Freistil</td>
-<td class="px-4 py-3">0:58.90</td>
-<td class="px-4 py-3">Vereins-Cup</td>
-</tr>
-<tr class="border-b border-border-light dark:border-border-dark">
-<td class="px-4 py-3">02.04.2023</td>
-<td class="px-4 py-3">50m Schmetterling</td>
-<td class="px-4 py-3">0:28.55</td>
-<td class="px-4 py-3">Training</td>
-</tr>
-<tr class="border-b border-border-light dark:border-border-dark">
-<td class="px-4 py-3">18.03.2023</td>
-<td class="px-4 py-3">200m Rücken</td>
-<td class="px-4 py-3 font-semibold text-green-500">2:15.40 <span class="text-xs font-medium text-green-600 dark:text-green-400">(PB)</span></td>
-<td class="px-4 py-3">Landesmeisterschaft</td>
-</tr>
-<tr>
-<td class="px-4 py-3">05.02.2023</td>
-<td class="px-4 py-3">100m Freistil</td>
-<td class="px-4 py-3">0:58.50</td>
-<td class="px-4 py-3">Training</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="lg:col-span-1 bg-white dark:bg-card-dark rounded-xl shadow-main p-6 border border-border-light dark:border-border-dark flex flex-col">
-<h2 class="text-slate-900 dark:text-white text-xl font-semibold mb-4">Notizen &amp; Besonderheiten</h2>
-<div class="space-y-4 flex-grow flex flex-col">
-<div>
-<h3 class="text-slate-600 dark:text-slate-400 text-sm font-medium mb-1">Technikschwerpunkte</h3>
-<p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">- Hoher Ellbogen beim Kraulzug<br/>- Aktiver Beinschlag beim Rücken</p>
-</div>
-<div>
-<h3 class="text-slate-600 dark:text-slate-400 text-sm font-medium mb-1">Gesundheitliche Hinweise</h3>
-<p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">- Leichte Pollenallergie im Frühjahr</p>
-</div>
-<div>
-<h3 class="text-slate-600 dark:text-slate-400 text-sm font-medium mb-1">Zielzeiten (Saisonende)</h3>
-<p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">- 100m Freistil: &lt; 0:57.50<br/>- 200m Rücken: &lt; 2:14.00</p>
-</div>
-<div class="mt-auto pt-4">
-<textarea class="w-full text-sm bg-slate-50 dark:bg-background-dark text-slate-800 dark:text-slate-200 rounded-lg border-border-light dark:border-border-dark focus:ring-primary focus:border-primary placeholder:text-slate-400 dark:placeholder:text-slate-500" placeholder="Neue Notiz hinzufügen..." rows="4"></textarea>
-<button class="w-full flex items-center justify-center gap-2 min-w-[84px] cursor-pointer rounded-lg h-9 px-4 bg-slate-200 dark:bg-[#233648] text-slate-800 dark:text-white text-sm font-semibold leading-normal hover:bg-slate-300 dark:hover:bg-[#2d4257] transition-colors mt-2">
-<span class="truncate">Notiz speichern</span>
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-
-</body></html>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwimTrack – Athletenprofil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    data-page="athletes"
+    class="font-display bg-background-light text-text-light-primary transition-colors duration-300 dark:bg-background-dark dark:text-text-dark-primary"
+  >
+    <div class="relative flex min-h-screen w-full flex-col">
+      <div class="flex h-full w-full" data-screen-root>
+        <aside class="flex w-64 flex-col bg-background-dark p-4 text-white">
+          <div class="flex items-center gap-3 rounded-lg p-3">
+            <div class="size-8 text-primary">
+              <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h1 class="text-xl font-bold leading-tight">SwimTrack</h1>
+          </div>
+          <nav class="mt-8 flex flex-1 flex-col justify-between" aria-label="Hauptnavigation">
+            <div class="flex flex-col gap-2" data-nav-primary>
+              <button type="button" data-route="dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></button>
+              <button type="button" data-route="trainings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">calendar_month</span><span>Trainingsplanung</span></button>
+              <button type="button" data-route="athletes" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-white transition-colors hover:bg-white/10"><span class="material-symbols-outlined">groups</span><span>Athleten</span></button>
+              <button type="button" data-route="performance" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">monitoring</span><span>Leistungsdaten</span></button>
+              <button type="button" data-route="reports" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">bar_chart</span><span>Reports &amp; Export</span></button>
+            </div>
+            <div class="flex flex-col gap-2" data-nav-secondary>
+              <button type="button" data-route="teams" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">diversity_3</span><span>Mannschaften</span></button>
+              <button type="button" data-route="settings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">settings</span><span>Einstellungen</span></button>
+              <div class="mt-4 flex items-center gap-3 border-t border-white/10 pt-4">
+                <div
+                  class="size-10 shrink-0 rounded-full bg-cover bg-center bg-no-repeat"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuACRaMkGk88fACEIyNhdOUQnsl1VyAenm4mnjdlxO3SlSBs-hldGWQkSUdrpZaGhaonSCDHsy8vSwdlCqb_3k2hTNpxpGgE5OfPnRgYHC1u7gOqE55U-kk-Bc99in9p_p32KXwPxTN8z6C5C23xkv_2TGqKNm0FHrpGhwK8RfekaA_VkqJKsWnimeYpNKG-he7d3h2o02S2YMzPrye5d8Et2WIW2P3giodOphaG9grOI6iPxCLhjOt9ovqSF3MY7Iyoxy0TED0k1Pc");'
+                ></div>
+                <div class="flex flex-col overflow-hidden">
+                  <p class="truncate text-base font-semibold leading-tight">Max Mustermann</p>
+                  <p class="truncate text-sm text-text-dark-secondary">Cheftrainer</p>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </aside>
+        <main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark" data-screen-content>
+          <header class="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-border-light bg-background-light/80 px-10 backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/80">
+            <div class="flex min-w-72 flex-col gap-1">
+              <p class="text-2xl font-bold leading-tight tracking-tight">Athleten &amp; Entwicklung</p>
+              <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Profile, Messwerte &amp; Historie</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined pointer-events-none absolute left-3 text-xl text-text-light-secondary dark:text-text-dark-secondary">search</span>
+                <input
+                  id="athlete-search"
+                  type="search"
+                  class="h-11 w-64 rounded-lg border border-border-light bg-transparent pl-10 pr-3 text-sm outline-none transition focus:border-primary dark:border-border-dark"
+                  placeholder="Athlet:innen suchen"
+                />
+              </div>
+            </div>
+          </header>
+          <div class="space-y-6 p-6 lg:p-10">
+            <section class="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+              <article class="rounded-xl border border-border-light bg-card-light p-0 dark:border-border-dark dark:bg-card-dark">
+                <header class="flex items-center justify-between border-b border-border-light px-6 py-4 dark:border-border-dark">
+                  <div>
+                    <h2 class="text-lg font-semibold leading-tight">Teamübersicht</h2>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Alle Athlet:innen auf einen Blick</p>
+                  </div>
+                  <span class="rounded-full bg-card-light px-3 py-1 text-xs font-medium text-text-light-secondary ring-1 ring-border-light dark:bg-card-dark dark:text-text-dark-secondary dark:ring-border-dark">Live-Daten</span>
+                </header>
+                <div id="athlete-list" class="max-h-[32rem] overflow-y-auto p-2"></div>
+              </article>
+              <article class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <header class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 class="text-lg font-semibold leading-tight">Profil &amp; Verlauf</h2>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Fokusfelder, Messwerte &amp; Anwesenheit</p>
+                  </div>
+                  <button type="button" class="flex items-center gap-2 rounded-lg bg-card-light px-4 py-2 text-sm font-medium text-text-light-secondary ring-1 ring-border-light transition hover:bg-zinc-50 dark:bg-card-dark dark:text-text-dark-secondary dark:ring-border-dark dark:hover:bg-[#2a3f53]" data-action="export-athlete">
+                    <span class="material-symbols-outlined text-base">ios_share</span>
+                    <span>Profil exportieren</span>
+                  </button>
+                </header>
+                <div id="athlete-profile" class="mt-6 space-y-6"></div>
+              </article>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,182 +1,147 @@
 <!DOCTYPE html>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwimTrack – Einstellungen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    data-page="settings"
+    class="font-display bg-background-light text-text-light-primary transition-colors duration-300 dark:bg-background-dark dark:text-text-dark-primary"
+  >
+    <div class="relative flex min-h-screen w-full flex-col">
+      <div class="flex h-full w-full" data-screen-root>
+        <aside class="flex w-64 flex-col bg-background-dark p-4 text-white">
+          <div class="flex items-center gap-3 rounded-lg p-3">
+            <div class="size-8 text-primary">
+              <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h1 class="text-xl font-bold leading-tight">SwimTrack</h1>
+          </div>
+          <nav class="mt-8 flex flex-1 flex-col justify-between" aria-label="Hauptnavigation">
+            <div class="flex flex-col gap-2" data-nav-primary>
+              <button type="button" data-route="dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></button>
+              <button type="button" data-route="trainings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">calendar_month</span><span>Trainingsplanung</span></button>
+              <button type="button" data-route="athletes" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">groups</span><span>Athleten</span></button>
+              <button type="button" data-route="performance" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">monitoring</span><span>Leistungsdaten</span></button>
+              <button type="button" data-route="reports" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">bar_chart</span><span>Reports &amp; Export</span></button>
+            </div>
+            <div class="flex flex-col gap-2" data-nav-secondary>
+              <button type="button" data-route="teams" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">diversity_3</span><span>Mannschaften</span></button>
+              <button type="button" data-route="settings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-white transition-colors hover:bg-white/10"><span class="material-symbols-outlined">settings</span><span>Einstellungen</span></button>
+              <div class="mt-4 flex items-center gap-3 border-t border-white/10 pt-4">
+                <div
+                  class="size-10 shrink-0 rounded-full bg-cover bg-center bg-no-repeat"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuACRaMkGk88fACEIyNhdOUQnsl1VyAenm4mnjdlxO3SlSBs-hldGWQkSUdrpZaGhaonSCDHsy8vSwdlCqb_3k2hTNpxpGgE5OfPnRgYHC1u7gOqE55U-kk-Bc99in9p_p32KXwPxTN8z6C5C23xkv_2TGqKNm0FHrpGhwK8RfekaA_VkqJKsWnimeYpNKG-he7d3h2o02S2YMzPrye5d8Et2WIW2P3giodOphaG9grOI6iPxCLhjOt9ovqSF3MY7Iyoxy0TED0k1Pc");'
+                ></div>
+                <div class="flex flex-col overflow-hidden">
+                  <p class="truncate text-base font-semibold leading-tight">Max Mustermann</p>
+                  <p class="truncate text-sm text-text-dark-secondary">Cheftrainer</p>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </aside>
+        <main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark" data-screen-content>
+          <header class="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-border-light bg-background-light/80 px-10 backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/80">
+            <div class="flex min-w-72 flex-col gap-1">
+              <p class="text-2xl font-bold leading-tight tracking-tight">Plattform-Einstellungen</p>
+              <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Benachrichtigungen, Datenschutz &amp; Integrationen</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="submit" form="settings-form" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90">
+                Änderungen speichern
+              </button>
+            </div>
+          </header>
+          <div class="space-y-6 p-6 lg:p-10">
+            <form id="settings-form" class="grid gap-6 lg:grid-cols-2">
+              <fieldset class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <legend class="text-lg font-semibold leading-tight">Benachrichtigungen</legend>
+                <p class="mt-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">Steuere, welche Hinweise an Trainer:innen und Athlet:innen gesendet werden.</p>
+                <label class="mt-4 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="emailAlerts" checked class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>E-Mail Erinnerungen an Trainer:innen</span>
+                </label>
+                <label class="mt-2 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="athletePortal" checked class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Athletenportal freischalten</span>
+                </label>
+                <label class="mt-2 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="weeklyDigest" class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Wöchentliche Zusammenfassung per Mail</span>
+                </label>
+              </fieldset>
 
-<html class="dark" lang="de"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Einstellungen / Stammdaten</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-<script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101922",
-                    },
-                    fontFamily: {
-                        "display": ["Lexend", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            font-size: 24px;
-        }
-        .material-symbols-outlined.fill {
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display">
-<div class="relative flex h-auto min-h-screen w-full flex-col">
-<div class="flex h-full min-h-screen">
-<!-- SideNavBar -->
-<aside class="flex w-64 flex-col bg-[#111a22] p-4 text-white">
-<div class="flex flex-col gap-4">
-<div class="flex items-center gap-3">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBA-X9ZU4ZS7bJNszX1A8YHsXtX67xLQAcT4H0twOsU9IdQpACIM8mbY9bxZ0Cdpb55PTL9bUy_PX0BifEsEi7IPK40BMPuIED3a8VNu3cpcZ7iyS2Vb4A-fy5DFsaBkloVpFdqUydcAf3ADNJ7L_-yfMA1sHqS4yF_GOmmUOmI5iKE_BNYx1NeDqTw-HLCHRE8quue1PQQELa8qBZTSZwGjPLfA1DidCRQ114HiSmTJGYnDA__Bda4mEyFlK1n2YBVJSuPQk_a-xc");'></div>
-<div class="flex flex-col">
-<h1 class="text-white text-base font-medium leading-normal">Max Mustermann</h1>
-<p class="text-[#92adc9] text-sm font-normal leading-normal">Cheftrainer</p>
-</div>
-</div>
-<div class="flex flex-col gap-2">
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#233648]" href="#">
-<span class="material-symbols-outlined fill">group</span>
-<p class="text-white text-sm font-medium leading-normal">Mannschaften</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
-<span class="material-symbols-outlined">pool</span>
-<p class="text-white text-sm font-medium leading-normal">Athleten</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
-<span class="material-symbols-outlined">person</span>
-<p class="text-white text-sm font-medium leading-normal">Trainer</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
-<span class="material-symbols-outlined">list_alt</span>
-<p class="text-white text-sm font-medium leading-normal">Standardlisten</p>
-</a>
-</div>
-</div>
-<div class="mt-auto flex flex-col gap-4">
-<button class="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em]">
-<span class="truncate">Abmelden</span>
-</button>
-<div class="flex flex-col gap-1">
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
-<span class="material-symbols-outlined">help</span>
-<p class="text-white text-sm font-medium leading-normal">Hilfe</p>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#233648]/60 transition-colors" href="#">
-<span class="material-symbols-outlined">settings</span>
-<p class="text-white text-sm font-medium leading-normal">Einstellungen</p>
-</a>
-</div>
-</div>
-</aside>
-<!-- Main Content -->
-<main class="flex-1 p-6 lg:p-10">
-<div class="mx-auto max-w-7xl">
-<!-- PageHeading -->
-<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-<div class="flex min-w-72 flex-col gap-2">
-<p class="text-zinc-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Mannschaften</p>
-<p class="text-zinc-500 dark:text-[#92adc9] text-base font-normal leading-normal">Verwalten Sie hier alle Schwimmmannschaften.</p>
-</div>
-<button class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
-<span class="material-symbols-outlined">add</span>
-<span class="truncate">Neue Mannschaft</span>
-</button>
-</div>
-<!-- SearchBar -->
-<div class="mb-6">
-<label class="flex flex-col min-w-40 h-12 w-full">
-<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-zinc-100 dark:bg-[#233648]">
-<div class="text-zinc-400 dark:text-[#92adc9] flex items-center justify-center pl-4">
-<span class="material-symbols-outlined">search</span>
-</div>
-<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-zinc-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-zinc-100 dark:bg-[#233648] h-full placeholder:text-zinc-400 dark:placeholder:text-[#92adc9] px-4 pl-2 text-base font-normal leading-normal" placeholder="Mannschaft suchen..." value=""/>
-</div>
-</label>
-</div>
-<!-- Table -->
-<div class="overflow-x-auto @container">
-<div class="overflow-hidden rounded-lg border border-zinc-200 dark:border-[#324d67] bg-white dark:bg-[#111a22]">
-<table class="w-full">
-<thead class="bg-zinc-50 dark:bg-[#192633]">
-<tr>
-<th class="px-4 py-3 text-left text-zinc-600 dark:text-white w-2/5 text-sm font-medium leading-normal">Name</th>
-<th class="px-4 py-3 text-left text-zinc-600 dark:text-white w-1/5 text-sm font-medium leading-normal">Kürzel</th>
-<th class="px-4 py-3 text-left text-zinc-600 dark:text-white w-1/5 text-sm font-medium leading-normal">Anzahl Athleten</th>
-<th class="px-4 py-3 text-left text-zinc-400 dark:text-[#92adc9] w-1/5 text-sm font-medium leading-normal">Aktionen</th>
-</tr>
-</thead>
-<tbody>
-<tr class="border-t border-zinc-200 dark:border-t-[#324d67]">
-<td class="h-[72px] px-4 py-2 text-zinc-900 dark:text-white text-sm font-normal leading-normal">1. Mannschaft</td>
-<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">M1</td>
-<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">15</td>
-<td class="h-[72px] px-4 py-2">
-<button class="text-primary hover:underline text-sm font-bold leading-normal tracking-[0.015em]">Bearbeiten</button>
-</td>
-</tr>
-<tr class="border-t border-zinc-200 dark:border-t-[#324d67]">
-<td class="h-[72px] px-4 py-2 text-zinc-900 dark:text-white text-sm font-normal leading-normal">Nachwuchsteam</td>
-<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">NW</td>
-<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">22</td>
-<td class="h-[72px] px-4 py-2">
-<button class="text-primary hover:underline text-sm font-bold leading-normal tracking-[0.015em]">Bearbeiten</button>
-</td>
-</tr>
-<tr class="border-t border-zinc-200 dark:border-t-[#324d67]">
-<td class="h-[72px] px-4 py-2 text-zinc-900 dark:text-white text-sm font-normal leading-normal">Masters</td>
-<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">MA</td>
-<td class="h-[72px] px-4 py-2 text-zinc-500 dark:text-[#92adc9] text-sm font-normal leading-normal">18</td>
-<td class="h-[72px] px-4 py-2">
-<button class="text-primary hover:underline text-sm font-bold leading-normal tracking-[0.015em]">Bearbeiten</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<!-- SectionHeader for a different section -->
-<div class="mt-12">
-<h2 class="text-zinc-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5 border-b border-zinc-200 dark:border-[#324d67]">Standardlisten</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-<div class="bg-white dark:bg-[#111a22] p-4 rounded-lg border border-zinc-200 dark:border-[#324d67]">
-<h3 class="font-bold text-zinc-900 dark:text-white mb-2">Trainingsarten</h3>
-<p class="text-sm text-zinc-500 dark:text-[#92adc9] mb-4">Verwalten Sie Standard-Trainingsarten wie Technik, Ausdauer oder Sprint.</p>
-<button class="text-primary text-sm font-bold hover:underline">Liste bearbeiten</button>
-</div>
-<div class="bg-white dark:bg-[#111a22] p-4 rounded-lg border border-zinc-200 dark:border-[#324d67]">
-<h3 class="font-bold text-zinc-900 dark:text-white mb-2">Standardstrecken</h3>
-<p class="text-sm text-zinc-500 dark:text-[#92adc9] mb-4">Definieren Sie häufig genutzte Strecken und Distanzen für das Training.</p>
-<button class="text-primary text-sm font-bold hover:underline">Liste bearbeiten</button>
-</div>
-<div class="bg-white dark:bg-[#111a22] p-4 rounded-lg border border-zinc-200 dark:border-[#324d67]">
-<h3 class="font-bold text-zinc-900 dark:text-white mb-2">Standard-Reports</h3>
-<p class="text-sm text-zinc-500 dark:text-[#92adc9] mb-4">Konfigurieren Sie Vorlagen für regelmäßige Trainingsauswertungen.</p>
-<button class="text-primary text-sm font-bold hover:underline">Liste bearbeiten</button>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-</div>
-</body></html>
+              <fieldset class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <legend class="text-lg font-semibold leading-tight">Datenschutz &amp; Compliance</legend>
+                <p class="mt-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">Dokumentiere Richtlinien für DSGVO-konformen Umgang mit Daten.</p>
+                <label class="mt-4 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="anonymize" class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Leistungsdaten für Reports anonymisieren</span>
+                </label>
+                <label class="mt-2 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="gdpr" checked class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Datenschutzhinweise akzeptiert</span>
+                </label>
+                <label class="mt-2 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="consentArchive" class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Einwilligungen automatisch archivieren</span>
+                </label>
+              </fieldset>
+
+              <fieldset class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <legend class="text-lg font-semibold leading-tight">Integrationen</legend>
+                <p class="mt-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">Verbinde Wearables, Kalender oder Datenplattformen.</p>
+                <label class="mt-4 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="wearables" class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Wearable-Schnittstelle aktivieren</span>
+                </label>
+                <label class="mt-2 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="calendarSync" checked class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Kalendersynchronisation aktiv</span>
+                </label>
+                <label class="mt-2 flex items-start gap-3 text-sm">
+                  <input type="checkbox" name="videoReview" class="mt-1 size-4 rounded border-border-light text-primary focus:ring-primary" />
+                  <span>Videoanalyse automatisch importieren</span>
+                </label>
+              </fieldset>
+
+              <fieldset class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <legend class="text-lg font-semibold leading-tight">Stammdaten</legend>
+                <p class="mt-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">Passe Namen, Logos und Kontaktinformationen an.</p>
+                <label class="mt-4 flex flex-col gap-2 text-sm">
+                  <span>Organisation</span>
+                  <input type="text" name="organisation" value="SwimTrack Squad" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+                </label>
+                <label class="mt-4 flex flex-col gap-2 text-sm">
+                  <span>Kontaktadresse</span>
+                  <input type="email" name="contact" value="coaching@swimtrack.app" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+                </label>
+                <label class="mt-4 flex flex-col gap-2 text-sm">
+                  <span>Support-Notiz</span>
+                  <textarea name="supportNote" rows="4" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark">Support täglich 08:00 – 18:00 Uhr erreichbar.</textarea>
+                </label>
+              </fieldset>
+            </form>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

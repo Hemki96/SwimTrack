@@ -1,230 +1,81 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="de"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Datenexport / Reports</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-<script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#137fec",
-            "background-light": "#f6f7f8",
-            "background-dark": "#101922",
-          },
-          fontFamily: {
-            "display": ["Lexend", "sans-serif"]
-          },
-          borderRadius: {
-            "DEFAULT": "0.25rem",
-            "lg": "0.5rem",
-            "xl": "0.75rem",
-            "full": "9999px"
-          },
-        },
-      },
-    }
-  </script>
-<style>
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      font-size: 24px;
-    }
-  </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
-<div class="relative flex min-h-screen w-full">
-<!-- SideNavBar -->
-<nav class="flex w-64 flex-col gap-4 border-r border-gray-200/10 bg-[#111a22] p-4">
-<div class="flex flex-col gap-4">
-<div class="flex items-center gap-3">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCuqN3OQbbrqbBs_O3-eO_Ch6DdN3rck0aiUOSLHzkGoUnd6ZX9SnEUo4TU6cpfhJuegAKqyQwu8ko3Hm1lyKb2rGZqqKc916-8YPAknm02awR7y7KpniInOkgEMFFPCx2Ljogqgpm9hrSA4YSAyhk_wVQOB5fqFrS4rTAs3LC_z_-uN4c9ac-hgJdZEAUPdzJMX4FBxSmTGa1K0ezdOhLW5s3KDWWgm1wNnZFwdydRIg--7qnDs0yJwaqAHskmLKg_ld3hHWqjlG4");'></div>
-<div class="flex flex-col">
-<h1 class="text-white text-base font-medium leading-normal">Max Mustermann</h1>
-<p class="text-gray-400 dark:text-[#92adc9] text-sm font-normal leading-normal">Haupttrainer</p>
-</div>
-</div>
-<div class="flex flex-col gap-2">
-<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 hover:bg-gray-700/50" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<p class="text-sm font-medium leading-normal">Dashboard</p>
-</a>
-<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 hover:bg-gray-700/50" href="#">
-<span class="material-symbols-outlined">calendar_add_on</span>
-<p class="text-sm font-medium leading-normal">Trainingsplanung</p>
-</a>
-<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 hover:bg-gray-700/50" href="#">
-<span class="material-symbols-outlined">groups</span>
-<p class="text-sm font-medium leading-normal">Athleten</p>
-</a>
-<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 hover:bg-gray-700/50" href="#">
-<span class="material-symbols-outlined">bar_chart</span>
-<p class="text-sm font-medium leading-normal">Analyse</p>
-</a>
-<a class="flex items-center gap-3 rounded-lg bg-[#233648] px-3 py-2 text-white" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">download</span>
-<p class="text-sm font-medium leading-normal">Datenexport / Reports</p>
-</a>
-</div>
-</div>
-<div class="mt-auto flex flex-col gap-4">
-<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90">
-<span class="truncate">Neue Einheit planen</span>
-</button>
-<div class="flex flex-col gap-1">
-<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 hover:bg-gray-700/50" href="#">
-<span class="material-symbols-outlined">settings</span>
-<p class="text-sm font-medium leading-normal">Einstellungen</p>
-</a>
-<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-300 hover:bg-gray-700/50" href="#">
-<span class="material-symbols-outlined">help</span>
-<p class="text-sm font-medium leading-normal">Hilfe</p>
-</a>
-</div>
-</div>
-</nav>
-<!-- Main Content -->
-<main class="flex-1 overflow-y-auto">
-<div class="mx-auto max-w-7xl p-6 lg:p-8">
-<!-- PageHeading -->
-<div class="flex flex-wrap justify-between gap-3">
-<div class="flex min-w-72 flex-col gap-3">
-<h1 class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Datenexport / Reports</h1>
-<p class="text-gray-500 dark:text-[#92adc9] text-base font-normal leading-normal">Erstellen und exportieren Sie Berichte basierend auf Ihren Trainingsdaten.</p>
-</div>
-</div>
-<div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-5">
-<!-- Left Column: Configuration -->
-<div class="lg:col-span-2">
-<!-- SectionHeader -->
-<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pt-5">Berichtskonfiguration</h2>
-<!-- Step 1 -->
-<div class="mt-6">
-<label class="text-sm font-medium text-gray-700 dark:text-gray-300">Schritt 1: Berichtstyp wählen</label>
-<!-- BodyText -->
-<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal pt-1 pb-3">Ihre Auswahl beeinflusst die verfügbaren Filteroptionen.</p>
-<!-- SegmentedButtons -->
-<div class="flex">
-<div class="flex h-10 w-full items-center justify-center rounded-lg bg-gray-200 dark:bg-[#233648] p-1">
-<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 text-gray-500 has-[:checked]:bg-white has-[:checked]:text-gray-900 has-[:checked]:shadow-sm dark:text-[#92adc9] dark:has-[:checked]:bg-[#111a22] dark:has-[:checked]:text-white text-sm font-medium leading-normal">
-<span class="truncate">Mannschaft</span>
-<input checked="" class="invisible w-0" name="report_type" type="radio" value="Mannschaft"/>
-</label>
-<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 text-gray-500 has-[:checked]:bg-white has-[:checked]:text-gray-900 has-[:checked]:shadow-sm dark:text-[#92adc9] dark:has-[:checked]:bg-[#111a22] dark:has-[:checked]:text-white text-sm font-medium leading-normal">
-<span class="truncate">Athlet</span>
-<input class="invisible w-0" name="report_type" type="radio" value="Athlet"/>
-</label>
-</div>
-</div>
-</div>
-<!-- Step 2 -->
-<div class="mt-6">
-<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="date-range">Schritt 2: Zeitraum festlegen</label>
-<div class="relative mt-2">
-<span class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">calendar_month</span>
-<input class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#233648] py-2 pl-10 pr-4 text-gray-900 dark:text-white focus:border-primary focus:ring-primary" id="date-range" type="text" value="01. Mai 2024 - 31. Mai 2024"/>
-</div>
-</div>
-<!-- Step 3 -->
-<div class="mt-6">
-<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="group-select">Schritt 3: Gruppe definieren</label>
-<div class="relative mt-2">
-<span class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">groups</span>
-<select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#233648] py-2 pl-10 pr-10 text-gray-900 dark:text-white focus:border-primary focus:ring-primary" id="group-select">
-<option>Leistungsgruppe 1</option>
-<option>Leistungsgruppe 2</option>
-<option>Nachwuchsteam</option>
-</select>
-<span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">expand_more</span>
-</div>
-</div>
-<!-- Step 4 -->
-<div class="mt-6">
-<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="format-select">Schritt 4: Ausgabeformat wählen</label>
-<div class="relative mt-2">
-<span class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">description</span>
-<select class="w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#233648] py-2 pl-10 pr-10 text-gray-900 dark:text-white focus:border-primary focus:ring-primary" id="format-select">
-<option>PDF</option>
-<option>Excel / CSV</option>
-</select>
-<span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">expand_more</span>
-</div>
-</div>
-<!-- Action Button -->
-<div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-<button class="flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-4 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600">
-<span class="material-symbols-outlined">download</span>
-<span>Report generieren</span>
-</button>
-</div>
-</div>
-<!-- Right Column: Preview -->
-<div class="lg:col-span-3">
-<h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pt-5">Berichtsvorschau</h2>
-<div class="mt-6 h-full min-h-[500px] rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#111a22]/50 p-6">
-<div class="flex flex-col gap-2">
-<div class="h-6 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-4 w-1/2 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-</div>
-<div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-<div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-<div class="h-4 w-2/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="mt-2 h-8 w-1/3 animate-pulse rounded bg-gray-300 dark:bg-gray-600"></div>
-</div>
-<div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-<div class="h-4 w-2/5 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="mt-2 h-8 w-1/3 animate-pulse rounded bg-gray-300 dark:bg-gray-600"></div>
-</div>
-</div>
-<div class="mt-6">
-<div class="h-5 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="mt-3 space-y-2">
-<div class="h-3 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-</div>
-</div>
-<div class="mt-8">
-<div class="h-5 w-1/3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="mt-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-<div class="grid grid-cols-4 bg-gray-100 dark:bg-[#233648] p-3">
-<div class="h-4 animate-pulse rounded bg-gray-300 dark:bg-gray-600"></div>
-<div class="h-4 animate-pulse rounded bg-gray-300 dark:bg-gray-600"></div>
-<div class="h-4 animate-pulse rounded bg-gray-300 dark:bg-gray-600"></div>
-<div class="h-4 animate-pulse rounded bg-gray-300 dark:bg-gray-600"></div>
-</div>
-<div class="space-y-3 p-3">
-<div class="grid grid-cols-4 gap-3">
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-</div>
-<div class="grid grid-cols-4 gap-3">
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-</div>
-<div class="grid grid-cols-4 gap-3">
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-<div class="h-3 animate-pulse rounded bg-gray-200 dark:bg-gray-700/50"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-</body></html>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwimTrack – Datenexport</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    data-page="reports-export"
+    class="font-display bg-background-light text-text-light-primary transition-colors duration-300 dark:bg-background-dark dark:text-text-dark-primary"
+  >
+    <div class="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+      <article class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+        <header class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-lg font-semibold leading-tight">Export-Vorlagen</h2>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Datenquellen und Formate auswählen</p>
+          </div>
+          <button type="button" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90" data-action="export-start">
+            <span class="material-symbols-outlined text-base">file_download</span>
+            <span>Export starten</span>
+          </button>
+        </header>
+        <form id="export-form" class="mt-6 space-y-6">
+          <fieldset class="space-y-3">
+            <legend class="text-sm font-semibold uppercase tracking-wide text-text-light-secondary dark:text-text-dark-secondary">Datensatz</legend>
+            <div id="export-datasets" class="grid gap-3 md:grid-cols-2"></div>
+          </fieldset>
+          <fieldset class="space-y-3">
+            <legend class="text-sm font-semibold uppercase tracking-wide text-text-light-secondary dark:text-text-dark-secondary">Zeitraum &amp; Filter</legend>
+            <div class="grid gap-4 md:grid-cols-2">
+              <label class="flex flex-col gap-2 text-sm">
+                <span>Von</span>
+                <input type="date" id="export-date-from" name="from" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+              </label>
+              <label class="flex flex-col gap-2 text-sm">
+                <span>Bis</span>
+                <input type="date" id="export-date-to" name="to" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark" />
+              </label>
+              <label class="flex flex-col gap-2 text-sm">
+                <span>Team</span>
+                <select id="export-team" name="team" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark"></select>
+              </label>
+              <label class="flex flex-col gap-2 text-sm">
+                <span>Format</span>
+                <select id="export-format" name="format" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark">
+                  <option value="csv">CSV</option>
+                  <option value="xlsx">Excel</option>
+                  <option value="json">JSON</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+          <div class="rounded-xl bg-background-light p-4 text-sm text-text-light-secondary ring-1 ring-dashed ring-border-light dark:bg-background-dark dark:text-text-dark-secondary dark:ring-border-dark">
+            <p class="flex items-center gap-2"><span class="material-symbols-outlined text-base">info</span><span>Die Exporte werden serverseitig vorbereitet. Größere Datensätze können einige Minuten benötigen.</span></p>
+          </div>
+        </form>
+      </article>
+      <article class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+        <header class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold leading-tight">Letzte Exporte</h2>
+            <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Verlauf &amp; Download-Historie</p>
+          </div>
+          <button type="button" class="rounded-full bg-card-light px-3 py-1 text-xs font-medium text-text-light-secondary ring-1 ring-border-light transition hover:bg-zinc-50 dark:bg-card-dark dark:text-text-dark-secondary dark:ring-border-dark dark:hover:bg-[#2a3f53]" data-action="refresh-exports">Aktualisieren</button>
+        </header>
+        <ul id="export-history" class="mt-6 space-y-3"></ul>
+      </article>
+    </div>
+  </body>
+</html>
