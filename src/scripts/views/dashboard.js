@@ -1,29 +1,32 @@
 import { api } from "../api.js";
 import {
-  getCached,
+  Channels,
+  remember,
   setCached,
   invalidate,
   invalidateMatching,
   publish,
   subscribe,
 } from "../state.js";
+import { CachePolicies, getCacheTtl } from "../config/cachePolicies.js";
+import { clampDateRange, formatDate, isWithinRange } from "../utils/dates.js";
 
-const DASHBOARD_CACHE_PREFIX = "dashboard-data-";
-const DASHBOARD_CACHE_TTL = 5 * 60 * 1000;
-const TEAMS_CACHE_KEY = "teams-cache";
-const TEAMS_CACHE_TTL = 10 * 60 * 1000;
+const DASHBOARD_CACHE_PREFIX = `${CachePolicies.DASHBOARD.key}-`;
+const DASHBOARD_CACHE_TTL = getCacheTtl(CachePolicies.DASHBOARD);
+const TEAMS_CACHE_KEY = CachePolicies.DASHBOARD_TEAMS.key;
+const TEAMS_CACHE_TTL = getCacheTtl(CachePolicies.DASHBOARD_TEAMS);
 
 let detachSessionsListener = null;
 let detachTeamsListener = null;
 
 function ensureDashboardSubscriptions() {
   if (!detachSessionsListener) {
-    detachSessionsListener = subscribe("sessions/updated", () => {
+    detachSessionsListener = subscribe(Channels.SESSIONS_UPDATED, () => {
       invalidateDashboardCache();
     });
   }
   if (!detachTeamsListener) {
-    detachTeamsListener = subscribe("teams/updated", () => {
+    detachTeamsListener = subscribe(Channels.TEAMS_UPDATED, () => {
       invalidate(TEAMS_CACHE_KEY);
     });
   }
@@ -57,15 +60,6 @@ const KPI_CONFIG = [
     tone: "text-text-light-secondary dark:text-text-dark-secondary",
   },
 ];
-
-function formatDate(value) {
-  const date = new Date(value);
-  return date.toLocaleDateString("de-DE", {
-    weekday: "short",
-    day: "2-digit",
-    month: "2-digit",
-  });
-}
 
 function buildAlertItems(data) {
   const alerts = [];
@@ -116,43 +110,45 @@ function buildAlertItems(data) {
 
 async function loadDashboardData(range = 30) {
   const cacheKey = `${DASHBOARD_CACHE_PREFIX}${range}`;
-  const cached = getCached(cacheKey);
-  if (cached) return cached;
+  return remember(
+    cacheKey,
+    async () => {
+      const [dashboard, sessions] = await Promise.all([
+        api.getDashboard({ range }),
+        api.getSessions({ includeAttendance: true }),
+      ]);
+      const effectiveRange = dashboard?.range_days ?? range;
+      const rangeWindow = clampDateRange(effectiveRange);
+      const sessionsInRange = sessions.filter(
+        (session) => session.session_date && isWithinRange(session.session_date, rangeWindow)
+      );
+      return {
+        dashboard,
+        sessions,
+        sessions_in_range: sessionsInRange,
+        attendance: sessionsInRange
+          .map((session) => ({
+            session,
+            attendance: Array.isArray(session.attendance) ? session.attendance : [],
+          }))
+          .filter((entry) =>
+            Array.isArray(entry.attendance) &&
+            entry.attendance.some(
+              (item) => typeof item.status === "string" && item.status.trim().length > 0
+            )
+          ),
+      };
+    },
+    { ttl: DASHBOARD_CACHE_TTL }
+  );
+}
 
-  const [dashboard, sessions] = await Promise.all([
-    api.getDashboard({ range }),
-    api.getSessions({ includeAttendance: true }),
-  ]);
-  const effectiveRange = dashboard?.range_days ?? range;
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const start = new Date(now);
-  start.setDate(start.getDate() - Math.max(0, effectiveRange - 1));
-  const sessionsInRange = sessions.filter((session) => {
-    if (!session.session_date) return false;
-    const sessionDate = new Date(`${session.session_date}T00:00:00`);
-    if (Number.isNaN(sessionDate.getTime())) {
-      return false;
-    }
-    return sessionDate >= start && sessionDate <= now;
-  });
-  const enriched = {
-    dashboard,
-    sessions,
-    sessions_in_range: sessionsInRange,
-    attendance: sessionsInRange
-      .map((session) => ({
-        session,
-        attendance: Array.isArray(session.attendance) ? session.attendance : [],
-      }))
-      .filter((entry) =>
-        Array.isArray(entry.attendance) &&
-        entry.attendance.some(
-          (item) => typeof item.status === "string" && item.status.trim().length > 0
-        )
-      ),
-  };
-  return setCached(cacheKey, enriched, { ttl: DASHBOARD_CACHE_TTL });
+function loadTeams() {
+  return remember(
+    TEAMS_CACHE_KEY,
+    () => api.getTeams(),
+    { ttl: TEAMS_CACHE_TTL }
+  );
 }
 
 function renderKpis(container, data) {
@@ -450,7 +446,7 @@ async function setupQuickCapture(root, refresh) {
     });
     dialog.close();
     form.reset();
-    publish("sessions/updated", { id: sessionId, action: "quick_capture" });
+    publish(Channels.SESSIONS_UPDATED, { id: sessionId, action: "quick_capture" });
     await refresh();
   });
 }
@@ -460,7 +456,7 @@ async function setupFilters(root, data) {
   const statusSelect = root.querySelector("#dashboard-status-filter");
   const upcomingContainer = root.querySelector("#dashboard-upcoming");
 
-  const teams = await api.getTeams();
+  const teams = await loadTeams();
   teamSelect.innerHTML = '<option value="all">Alle</option>';
   teams.forEach((team) => {
     const option = document.createElement("option");

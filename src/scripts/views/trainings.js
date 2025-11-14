@@ -1,17 +1,19 @@
 import { api } from "../api.js";
 import {
-  getCached,
-  setCached,
+  Channels,
+  remember,
   invalidate,
   invalidateMatching,
   publish,
   subscribe,
 } from "../state.js";
+import { CachePolicies, getCacheTtl } from "../config/cachePolicies.js";
+import { formatDateTime } from "../utils/dates.js";
 
-const SESSION_LIST_KEY = "sessions-all";
-const SESSION_DETAIL_PREFIX = "session-";
-const SESSION_LIST_TTL = 60 * 1000;
-const SESSION_DETAIL_TTL = 60 * 1000;
+const SESSION_LIST_KEY = `${CachePolicies.SESSIONS_COLLECTION.key}-all`;
+const SESSION_DETAIL_PREFIX = `${CachePolicies.SESSION_DETAIL.key}-`;
+const SESSION_LIST_TTL = getCacheTtl(CachePolicies.SESSIONS_COLLECTION);
+const SESSION_DETAIL_TTL = getCacheTtl(CachePolicies.SESSION_DETAIL);
 
 let detachSessionsUpdated = null;
 
@@ -19,7 +21,7 @@ function ensureSessionInvalidationListener() {
   if (detachSessionsUpdated) {
     return;
   }
-  detachSessionsUpdated = subscribe("sessions/updated", (event) => {
+  detachSessionsUpdated = subscribe(Channels.SESSIONS_UPDATED, (event) => {
     invalidate(SESSION_LIST_KEY);
     if (event && typeof event.id === "number") {
       invalidate(`${SESSION_DETAIL_PREFIX}${event.id}`);
@@ -37,24 +39,21 @@ const STATUS_LABELS = {
   abgeschlossen: "Abgeschlossen",
 };
 
-function formatDateTime(dateValue, timeValue) {
-  const date = new Date(`${dateValue}T${timeValue || "00:00"}`);
-  return `${date.toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" })} · ${date.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}`;
+function loadSessions() {
+  return remember(
+    SESSION_LIST_KEY,
+    () => api.getSessions(),
+    { ttl: SESSION_LIST_TTL }
+  );
 }
 
-async function loadSessions() {
-  const cached = getCached(SESSION_LIST_KEY);
-  if (cached) return cached;
-  const sessions = await api.getSessions();
-  return setCached(SESSION_LIST_KEY, sessions, { ttl: SESSION_LIST_TTL });
-}
-
-async function loadSessionDetail(id) {
+function loadSessionDetail(id) {
   const cacheKey = `${SESSION_DETAIL_PREFIX}${id}`;
-  const cached = getCached(cacheKey);
-  if (cached) return cached;
-  const detail = await api.getSession(id);
-  return setCached(cacheKey, detail, { ttl: SESSION_DETAIL_TTL });
+  return remember(
+    cacheKey,
+    () => api.getSession(id),
+    { ttl: SESSION_DETAIL_TTL }
+  );
 }
 
 function sessionStatusTone(status) {
@@ -658,7 +657,7 @@ export async function renderTrainings(root) {
     currentDetail = detail;
     async function handleSessionUpdate(payload) {
       await api.updateSession(sessionId, payload);
-      publish("sessions/updated", { id: sessionId, action: "update" });
+      publish(Channels.SESSIONS_UPDATED, { id: sessionId, action: "update" });
       await reloadSessions(sessionId);
     }
     updateActiveSession = handleSessionUpdate;
@@ -666,7 +665,7 @@ export async function renderTrainings(root) {
     renderSessionDetail(detailContainer, detail, handleSessionUpdate);
     renderAttendance(attendanceContainer, detail, async (entries) => {
       await api.saveAttendance(sessionId, entries);
-      publish("sessions/updated", { id: sessionId, action: "attendance" });
+      publish(Channels.SESSIONS_UPDATED, { id: sessionId, action: "attendance" });
       await reloadSessions(sessionId);
     });
     if (notesField && notesFeedback) {
@@ -725,7 +724,7 @@ export async function renderTrainings(root) {
       }
       try {
         await api.updateSession(state.activeSession, { notes: notesField.value.trim() || null });
-        publish("sessions/updated", { id: state.activeSession, action: "notes" });
+        publish(Channels.SESSIONS_UPDATED, { id: state.activeSession, action: "notes" });
         notesFeedback.textContent = "Notiz gespeichert.";
         notesFeedback.className = "text-xs text-success";
         await refreshDetail(state.activeSession);
@@ -746,7 +745,7 @@ export async function renderTrainings(root) {
       sessionDialog.openCreate(async (payload) => {
         const created = await api.createSession(payload);
         const newId = created?.session?.id;
-        publish("sessions/updated", { id: newId, action: "create" });
+        publish(Channels.SESSIONS_UPDATED, { id: newId, action: "create" });
         await reloadSessions(newId ?? undefined);
       });
     });
@@ -789,7 +788,7 @@ export async function renderTrainings(root) {
       sessionDialog.openDuplicate(currentDetail.session, async (payload) => {
         const duplicated = await api.duplicateSession(state.activeSession, payload);
         const newId = duplicated?.session?.id;
-        publish("sessions/updated", { id: newId, action: "duplicate" });
+        publish(Channels.SESSIONS_UPDATED, { id: newId, action: "duplicate" });
         await reloadSessions(newId ?? undefined);
       });
     });
@@ -883,7 +882,7 @@ function setupTrainingQuickCapture(root, trigger, getActiveSessionId, onSaved) {
       });
       dialog.close();
       form.reset();
-      publish("sessions/updated", { id: sessionId, action: "quick_capture" });
+      publish(Channels.SESSIONS_UPDATED, { id: sessionId, action: "quick_capture" });
       if (typeof onSaved === "function") {
         await onSaved();
       }
