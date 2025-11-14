@@ -98,21 +98,55 @@ function renderProfile(container, detail) {
   `;
 }
 
+function downloadAthleteProfile(detail) {
+  if (!detail) return;
+  const { athlete, metrics, attendance_history: attendance } = detail;
+  const lines = [];
+  lines.push("Profil");
+  lines.push(`Name;${athlete.first_name} ${athlete.last_name}`);
+  lines.push(`Team;${athlete.team_name}`);
+  lines.push(`Jahrgang;${athlete.birth_year}`);
+  lines.push(`Schwerpunkt;${athlete.focus_note || "-"}`);
+  lines.push("");
+  lines.push("Leistungsmetriken");
+  lines.push("Datum;Messung;Wert");
+  metrics.forEach((metric) => {
+    lines.push(`${metric.metric_date};${metric.metric_type};${metric.value} ${metric.unit}`);
+  });
+  lines.push("");
+  lines.push("Anwesenheit");
+  lines.push("Datum;Session;Status");
+  attendance.forEach((entry) => {
+    lines.push(`${entry.session_date};${entry.title};${entry.status}`);
+  });
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  const filename = `swimtrack-${athlete.last_name}-${athlete.first_name}.csv`.toLowerCase();
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
 export async function renderAthletes(root) {
   const listContainer = root.querySelector("#athlete-list");
   const searchInput = root.querySelector("#athlete-search");
   const profileContainer = root.querySelector("#athlete-profile");
+  const exportButton = root.querySelector('[data-action="export-athlete"]');
   const athletes = await loadAthletes();
 
   let activeId = athletes[0]?.id || null;
+  let activeDetail = null;
   renderList(listContainer, athletes, activeId);
 
   async function showProfile(id) {
     if (!id) {
       profileContainer.innerHTML = "";
+      activeDetail = null;
       return;
     }
     const detail = await loadAthleteDetail(id);
+     activeDetail = detail;
     renderProfile(profileContainer, detail);
     renderList(listContainer, athletes, id);
   }
@@ -134,6 +168,13 @@ export async function renderAthletes(root) {
 
   if (activeId) {
     await showProfile(activeId);
+  }
+
+  if (exportButton) {
+    exportButton.addEventListener("click", () => {
+      if (!activeDetail) return;
+      downloadAthleteProfile(activeDetail);
+    });
   }
 }
 

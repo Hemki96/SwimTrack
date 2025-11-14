@@ -13,7 +13,7 @@ async function loadMetrics(teamId, metricType) {
   return setCached(key, metrics);
 }
 
-function renderTable(container, metrics) {
+function renderTable(container, metrics, sortState, onSort) {
   container.innerHTML = "";
   if (!metrics.length) {
     container.innerHTML = '<p class="p-6 text-sm text-text-light-secondary dark:text-text-dark-secondary">Keine Messwerte vorhanden.</p>';
@@ -24,11 +24,11 @@ function renderTable(container, metrics) {
   table.innerHTML = `
     <thead>
       <tr class="bg-background-light/60 text-xs uppercase tracking-wide text-text-light-secondary dark:bg-background-dark/60 dark:text-text-dark-secondary">
-        <th class="px-4 py-3">Datum</th>
-        <th class="px-4 py-3">Athlet:in</th>
-        <th class="px-4 py-3">Team</th>
-        <th class="px-4 py-3">Messung</th>
-        <th class="px-4 py-3">Wert</th>
+        <th class="px-4 py-3 cursor-pointer" data-column="metric_date">Datum</th>
+        <th class="px-4 py-3 cursor-pointer" data-column="athlete">Athlet:in</th>
+        <th class="px-4 py-3 cursor-pointer" data-column="team_name">Team</th>
+        <th class="px-4 py-3 cursor-pointer" data-column="metric_type">Messung</th>
+        <th class="px-4 py-3 cursor-pointer" data-column="value">Wert</th>
       </tr>
     </thead>
     <tbody>
@@ -47,6 +47,18 @@ function renderTable(container, metrics) {
         .join("")}
     </tbody>
   `;
+  if (sortState?.column) {
+    const activeHeader = table.querySelector(`[data-column="${sortState.column}"]`);
+    if (activeHeader) {
+      activeHeader.classList.add("text-primary");
+      activeHeader.setAttribute("aria-sort", sortState.direction === "asc" ? "ascending" : "descending");
+    }
+  }
+  if (typeof onSort === "function") {
+    table.querySelectorAll("th[data-column]").forEach((th) => {
+      th.addEventListener("click", () => onSort(th.dataset.column));
+    });
+  }
   container.appendChild(table);
 }
 
@@ -143,8 +155,51 @@ export async function renderPerformance(root) {
   let currentMetrics = await loadMetrics(null, null);
   const athletes = await api.getAthletes();
   let currentBests = filterPersonalBests(athletes, null);
+  let tableSort = { column: null, direction: "asc" };
   updateMetricTypes(typeSelect, currentMetrics);
-  renderTable(tableContainer, currentMetrics);
+
+  function sortMetricsData(data) {
+    if (!tableSort.column) {
+      return data;
+    }
+    const sorted = data.slice().sort((a, b) => {
+      switch (tableSort.column) {
+        case "metric_date":
+          return new Date(a.metric_date) - new Date(b.metric_date);
+        case "athlete": {
+          const nameA = `${a.first_name} ${a.last_name}`.toLowerCase();
+          const nameB = `${b.first_name} ${b.last_name}`.toLowerCase();
+          return nameA.localeCompare(nameB, "de");
+        }
+        case "team_name":
+          return String(a.team_name || "").localeCompare(String(b.team_name || ""), "de");
+        case "metric_type":
+          return String(a.metric_type || "").localeCompare(String(b.metric_type || ""), "de");
+        case "value":
+          return Number(a.value) - Number(b.value);
+        default:
+          return 0;
+      }
+    });
+    return tableSort.direction === "asc" ? sorted : sorted.reverse();
+  }
+
+  function handleTableSort(column) {
+    if (tableSort.column === column) {
+      tableSort.direction = tableSort.direction === "asc" ? "desc" : "asc";
+    } else {
+      tableSort.column = column;
+      tableSort.direction = "asc";
+    }
+    applyTable();
+  }
+
+  function applyTable() {
+    const sortedMetrics = sortMetricsData(currentMetrics);
+    renderTable(tableContainer, sortedMetrics, tableSort, handleTableSort);
+  }
+
+  applyTable();
   renderTrend(trendContainer, currentMetrics);
   renderPersonalBests(bestsContainer, currentBests);
 
@@ -152,7 +207,8 @@ export async function renderPerformance(root) {
     const teamId = currentTeam === "all" || currentTeam === null ? null : Number(currentTeam);
     const metricType = currentType === "all" || currentType === null ? null : currentType;
     currentMetrics = await loadMetrics(teamId, metricType);
-    renderTable(tableContainer, currentMetrics);
+    tableSort = { column: null, direction: "asc" };
+    applyTable();
     renderTrend(trendContainer, currentMetrics);
     currentBests = filterPersonalBests(athletes, teamId === null ? null : teamId);
     renderPersonalBests(bestsContainer, currentBests);
@@ -164,7 +220,8 @@ export async function renderPerformance(root) {
     typeSelect.value = "all";
     currentMetrics = await loadMetrics(currentTeam === "all" ? null : Number(currentTeam), null);
     updateMetricTypes(typeSelect, currentMetrics);
-    renderTable(tableContainer, currentMetrics);
+    tableSort = { column: null, direction: "asc" };
+    applyTable();
     renderTrend(trendContainer, currentMetrics);
     currentBests = filterPersonalBests(athletes, currentTeam);
     renderPersonalBests(bestsContainer, currentBests);
@@ -178,7 +235,7 @@ export async function renderPerformance(root) {
   exportButton.addEventListener("click", () => {
     if (!currentMetrics.length) return;
     const header = ["Datum", "Athlet", "Team", "Messung", "Wert"];
-    const rows = currentMetrics.map((metric) => [
+    const rows = sortMetricsData(currentMetrics).map((metric) => [
       metric.metric_date,
       `${metric.first_name} ${metric.last_name}`,
       metric.team_name,

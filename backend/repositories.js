@@ -1,7 +1,12 @@
 const { getDatabase } = require('./db');
 
-function fetchDashboardKpis() {
+function fetchDashboardKpis({ rangeDays = 30 } = {}) {
   const db = getDatabase();
+  const sanitizedRange = Number.isFinite(Number(rangeDays)) && Number(rangeDays) > 0 ? Math.min(Number(rangeDays), 365) : 30;
+  const rangeModifier = `-${sanitizedRange} day`;
+  const attendanceModifier = rangeModifier;
+  const focusModifier = `-${Math.min(sanitizedRange * 2, 365)} day`;
+
   const sessions = db
     .prepare(`
       SELECT
@@ -11,17 +16,28 @@ function fetchDashboardKpis() {
         SUM(load_actual) AS total_load_actual,
         SUM(load_target) AS total_load_target
       FROM sessions
+      WHERE session_date >= date('now', ?)
     `)
-    .get();
+    .get(rangeModifier);
+
+  const missingDocsRow = db
+    .prepare(`
+      SELECT COUNT(*) AS count
+      FROM sessions
+      WHERE session_date >= date('now', ?)
+        AND status = 'abgeschlossen'
+        AND (notes IS NULL OR TRIM(notes) = '')
+    `)
+    .get(rangeModifier);
 
   const attendedRow = db
     .prepare(`
       SELECT COUNT(*) AS count
       FROM attendance a
       JOIN sessions s ON s.id = a.session_id
-      WHERE s.session_date >= date('now', '-30 day') AND a.status = 'anwesend'
+      WHERE s.session_date >= date('now', ?) AND a.status = 'anwesend'
     `)
-    .get();
+    .get(attendanceModifier);
   const attended = attendedRow ? attendedRow.count : 0;
 
   const totalAttendanceRow = db
@@ -29,9 +45,9 @@ function fetchDashboardKpis() {
       SELECT COUNT(*) AS count
       FROM attendance a
       JOIN sessions s ON s.id = a.session_id
-      WHERE s.session_date >= date('now', '-30 day')
+      WHERE s.session_date >= date('now', ?)
     `)
-    .get();
+    .get(attendanceModifier);
   const totalAttendance = totalAttendanceRow && totalAttendanceRow.count ? totalAttendanceRow.count : 1;
 
   const upcomingSessions = db
@@ -48,12 +64,12 @@ function fetchDashboardKpis() {
     .prepare(`
       SELECT focus_area, COUNT(*) AS count
       FROM sessions
-      WHERE session_date >= date('now', '-45 day')
+      WHERE session_date >= date('now', ?)
       GROUP BY focus_area
       ORDER BY count DESC
       LIMIT 6
     `)
-    .all();
+    .all(focusModifier);
 
   const sessionEvents = db
     .prepare(`
@@ -101,8 +117,10 @@ function fetchDashboardKpis() {
   const totalSessions = sessions.total_sessions || 0;
   const plannedSessions = totalSessions - completedSessions;
   const attendanceRate = attended / (totalAttendance || 1);
+  const missingDocumentations = missingDocsRow ? missingDocsRow.count : 0;
 
   return {
+    range_days: sanitizedRange,
     attendance_rate: Number.isFinite(attendanceRate) ? Number(attendanceRate.toFixed(2)) : 0,
     completed_sessions: completedSessions,
     in_progress_sessions: sessions.in_progress || 0,
@@ -112,6 +130,7 @@ function fetchDashboardKpis() {
     upcoming_sessions: upcomingSessions,
     focus_topics: focusTopics,
     activities: activities.slice(0, 6),
+    missing_documentations: missingDocumentations,
   };
 }
 
@@ -305,7 +324,18 @@ function fetchSession(sessionId) {
 
 function updateSession(sessionId, payload) {
   const db = getDatabase();
-  const allowed = new Set(['status', 'focus_area', 'notes', 'load_actual']);
+  const allowed = new Set([
+    'status',
+    'focus_area',
+    'notes',
+    'load_actual',
+    'title',
+    'session_date',
+    'start_time',
+    'duration_minutes',
+    'load_target',
+    'team_id',
+  ]);
   const assignments = [];
   const params = [];
 
@@ -325,6 +355,58 @@ function updateSession(sessionId, payload) {
   db.prepare(sql).run(...params);
 
   return fetchSession(sessionId);
+}
+
+function createSession(payload) {
+  const db = getDatabase();
+  const stmt = db.prepare(`
+    INSERT INTO sessions (
+      team_id,
+      title,
+      session_date,
+      start_time,
+      duration_minutes,
+      status,
+      focus_area,
+      load_target,
+      load_actual,
+      notes
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  const result = stmt.run(
+    payload.team_id,
+    payload.title,
+    payload.session_date,
+    payload.start_time,
+    payload.duration_minutes,
+    payload.status,
+    payload.focus_area,
+    payload.load_target,
+    payload.load_actual ?? null,
+    payload.notes ?? null
+  );
+  return fetchSession(result.lastInsertRowid);
+}
+
+function duplicateSession(sessionId, overrides = {}) {
+  const base = fetchSession(sessionId);
+  if (!base) {
+    return null;
+  }
+  const session = base.session;
+  const payload = {
+    team_id: overrides.team_id ?? session.team_id,
+    title: overrides.title ?? `${session.title} (Kopie)`,
+    session_date: overrides.session_date ?? session.session_date,
+    start_time: overrides.start_time ?? session.start_time,
+    duration_minutes: overrides.duration_minutes ?? session.duration_minutes,
+    status: overrides.status ?? session.status,
+    focus_area: overrides.focus_area ?? session.focus_area,
+    load_target: overrides.load_target ?? session.load_target,
+    load_actual: overrides.load_actual ?? session.load_actual,
+    notes: overrides.notes ?? session.notes,
+  };
+  return createSession(payload);
 }
 
 function upsertAttendance(sessionId, rows) {
@@ -406,6 +488,46 @@ function fetchMetrics({ teamId, metricType } = {}) {
   return db.prepare(sql).all(...params);
 }
 
+function createTeam(payload) {
+  const db = getDatabase();
+  const stmt = db.prepare(`
+    INSERT INTO teams (name, short_name, level, coach, training_days, focus_theme)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+  const result = stmt.run(
+    payload.name,
+    payload.short_name,
+    payload.level,
+    payload.coach,
+    payload.training_days,
+    payload.focus_theme
+  );
+  return fetchTeam(result.lastInsertRowid);
+}
+
+function updateTeam(teamId, payload) {
+  const db = getDatabase();
+  const allowed = new Set(['name', 'short_name', 'level', 'coach', 'training_days', 'focus_theme']);
+  const assignments = [];
+  const params = [];
+
+  Object.entries(payload || {}).forEach(([key, value]) => {
+    if (allowed.has(key)) {
+      assignments.push(`${key} = ?`);
+      params.push(value);
+    }
+  });
+
+  if (!assignments.length) {
+    return fetchTeam(teamId);
+  }
+
+  params.push(teamId);
+  const sql = `UPDATE teams SET ${assignments.join(', ')} WHERE id = ?`;
+  db.prepare(sql).run(...params);
+  return fetchTeam(teamId);
+}
+
 module.exports = {
   fetchDashboardKpis,
   fetchTeams,
@@ -415,9 +537,13 @@ module.exports = {
   fetchSessions,
   fetchSession,
   updateSession,
+  createSession,
+  duplicateSession,
   upsertAttendance,
   fetchReports,
   fetchLatestNote,
   saveNote,
   fetchMetrics,
+  createTeam,
+  updateTeam,
 };
