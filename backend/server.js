@@ -14,6 +14,8 @@ const metricsRouter = require('./routes/metrics');
 const reportsRouter = require('./routes/reports');
 const notesRouter = require('./routes/notes');
 const dashboardRouter = require('./routes/dashboard');
+const errorHandler = require('./middleware/errorHandler');
+const { createHttpError } = require('./utils/httpError');
 
 try {
   getDatabase();
@@ -79,9 +81,11 @@ app.use('/reports', reportsRouter);
 app.use('/notes', notesRouter);
 app.use('/metrics', metricsRouter);
 
-app.use((req, res) => {
-  res.status(404).json({ detail: 'Endpunkt nicht gefunden' });
+app.use((req, res, next) => {
+  next(createHttpError(404, 'Endpunkt nicht gefunden'));
 });
+
+app.use(errorHandler);
 
 const server = app.listen(config.port, config.host, () => {
   console.log(`SwimTrack API läuft auf ${config.host}:${config.port}`);
