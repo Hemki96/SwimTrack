@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,308 +7,67 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="src/styles/main.css" />
-    <link rel="stylesheet" href="src/styles/layout.css" />
-    <script type="module" src="src/scripts/app.js" defer></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#137fec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+              "card-light": "#ffffff",
+              "card-dark": "#1a2530",
+              "card-muted": "#18232e",
+              "text-light-primary": "#182431",
+              "text-light-secondary": "#6b7785",
+              "text-dark-primary": "#e1e6eb",
+              "text-dark-secondary": "#92adc9",
+              "border-light": "#e5e7eb",
+              "border-dark": "#2a3947",
+              success: "#22c55e",
+              warning: "#facc15",
+              danger: "#f97316",
+            },
+            fontFamily: {
+              display: ["Lexend", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.375rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              "2xl": "1rem",
+              full: "9999px",
+            },
+            boxShadow: {
+              card: "0 10px 40px -25px rgba(19, 127, 236, 0.45)",
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <header class="app-header">
-      <div class="brand">
-        <img src="src/assets/logo.svg" alt="SwimTrack" class="brand__logo" />
-        <div class="brand__text">
-          <span class="brand__title">SwimTrack</span>
-          <span class="brand__subtitle">Trainingssteuerung. Klar strukturiert.</span>
-        </div>
+  <body
+    class="bg-background-light font-display text-text-light-primary antialiased transition-colors duration-300 dark:bg-background-dark dark:text-text-dark-primary"
+  >
+    <noscript>
+      <div class="mx-auto max-w-2xl p-6 text-center text-sm">
+        <p>
+          SwimTrack benötigt JavaScript, um die interaktiven Dashboards und Trainingsdaten zu laden.
+          Bitte aktiviere JavaScript in deinem Browser.
+        </p>
       </div>
-      <nav class="main-nav" aria-label="Hauptnavigation">
-        <button class="nav-button" data-target="dashboard">Dashboard</button>
-        <button class="nav-button" data-target="trainings">Trainings</button>
-        <button class="nav-button" data-target="performance">Leistungsdaten</button>
-        <button class="nav-button" data-target="athletes">Athleten</button>
-        <button class="nav-button" data-target="teams">Mannschaften</button>
-        <button class="nav-button" data-target="reports">Reports</button>
-        <button class="nav-button" data-target="settings">Einstellungen</button>
-      </nav>
-      <div class="header-actions">
-        <button class="button button--secondary" id="quick-capture">Schnellerfassung</button>
-        <button class="button button--primary">Neue Trainingseinheit</button>
-      </div>
-    </header>
-
-    <main class="layout">
-      <aside class="layout__sidebar" aria-label="Schnellfilter">
-        <section class="sidebar-card">
-          <h2>Anstehende Sessions</h2>
-          <ul class="sidebar-list" id="upcoming-sessions"></ul>
-        </section>
-        <section class="sidebar-card">
-          <h2>Filter</h2>
-          <div class="chip-group" id="team-filters"></div>
-          <div class="chip-group" id="focus-filters"></div>
-        </section>
-        <section class="sidebar-card">
-          <h2>Notizen</h2>
-          <textarea
-            id="coach-notes"
-            class="textarea"
-            rows="6"
-            placeholder="Stichpunkte für die nächste Besprechung"
-          ></textarea>
-          <button class="button button--ghost" id="save-notes">Notiz speichern</button>
-          <p class="save-feedback" id="save-feedback" role="status" aria-live="polite"></p>
-        </section>
-      </aside>
-
-      <section class="layout__content" id="content"></section>
-    </main>
-
-    <dialog id="quick-capture-dialog" class="dialog">
-      <form method="dialog" class="dialog__container" id="quick-capture-form">
-        <header class="dialog__header">
-          <h2>Schnellerfassung</h2>
-          <button class="dialog__close" aria-label="Dialog schließen">×</button>
-        </header>
-        <div class="dialog__body">
-          <label class="field">
-            <span>Trainingseinheit</span>
-            <select name="session" required></select>
-          </label>
-          <label class="field">
-            <span>Status</span>
-            <div class="radio-group">
-              <label><input type="radio" name="status" value="geplant" checked /> Geplant</label>
-              <label><input type="radio" name="status" value="gestartet" /> Gestartet</label>
-              <label><input type="radio" name="status" value="abgeschlossen" /> Abgeschlossen</label>
-            </div>
-          </label>
-          <label class="field">
-            <span>Fokus</span>
-            <input name="focus" type="text" placeholder="z. B. Technik, Ausdauer" />
-          </label>
-          <label class="field">
-            <span>Bemerkung</span>
-            <textarea name="note" rows="3" placeholder="Optional"></textarea>
-          </label>
-        </div>
-        <footer class="dialog__footer">
-          <button class="button button--ghost" value="cancel">Abbrechen</button>
-          <button class="button button--primary" value="default">Speichern</button>
-        </footer>
-      </form>
-    </dialog>
-
-    <template id="dashboard-template">
-      <section class="panel-grid">
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h1>Team KPI Überblick</h1>
-            <div class="timeframe-switch" role="radiogroup" aria-label="Zeitraum">
-              <button class="timeframe-chip" data-range="7">7 Tage</button>
-              <button class="timeframe-chip timeframe-chip--active" data-range="30">30 Tage</button>
-              <button class="timeframe-chip" data-range="90">90 Tage</button>
-            </div>
-          </header>
-          <div class="kpi-grid" id="kpi-grid"></div>
-        </article>
-
-        <article class="panel">
-          <header class="panel__header">
-            <h2>Trainingsbelastung</h2>
-            <span class="panel__subtitle">Soll-Ist Vergleich pro Woche</span>
-          </header>
-          <div class="chart chart--bar" id="load-chart" role="img" aria-label="Trainingsbelastung"></div>
-        </article>
-
-        <article class="panel">
-          <header class="panel__header">
-            <h2>Anwesenheitsquote</h2>
-            <span class="panel__subtitle">Letzte 5 Sessions</span>
-          </header>
-          <div class="chart chart--line" id="attendance-chart" role="img"></div>
-        </article>
-
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h2>Team Fokusthemen</h2>
-            <span class="panel__subtitle">Basierend auf Trainingsprotokollen</span>
-          </header>
-          <div class="tag-cloud" id="focus-cloud"></div>
-        </article>
-
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h2>Letzte Aktivitäten</h2>
-          </header>
-          <ul class="activity-feed" id="activity-feed"></ul>
-        </article>
-      </section>
-    </template>
-
-    <template id="trainings-template">
-      <section class="panel-grid">
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h1>Trainingsübersicht</h1>
-            <div class="panel__actions">
-              <select id="calendar-team-filter" class="select">
-                <option value="all">Alle Mannschaften</option>
-              </select>
-              <select id="calendar-view" class="select">
-                <option value="week">Wochenansicht</option>
-                <option value="month">Monatsansicht</option>
-              </select>
-            </div>
-          </header>
-          <div class="calendar" id="calendar"></div>
-        </article>
-
-        <article class="panel">
-          <header class="panel__header">
-            <h2>Detail zur ausgewählten Einheit</h2>
-          </header>
-          <div class="session-detail" id="session-detail"></div>
-        </article>
-
-        <article class="panel">
-          <header class="panel__header">
-            <h2>Anwesenheit & Stimmungen</h2>
-          </header>
-          <div class="session-attendance" id="session-attendance"></div>
-        </article>
-      </section>
-    </template>
-
-    <template id="performance-template">
-      <section class="panel-grid">
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h1>Leistungsdatenerfassung</h1>
-            <div class="panel__actions">
-              <select id="metric-team-select" class="select"></select>
-              <select id="metric-type-select" class="select"></select>
-              <button class="button button--secondary" id="export-performance">CSV Export</button>
-            </div>
-          </header>
-          <div class="table" role="table" aria-label="Leistungsdaten" id="performance-table"></div>
-        </article>
-
-        <article class="panel">
-          <header class="panel__header">
-            <h2>Messwerte im Trend</h2>
-            <span class="panel__subtitle">Rolling Average (6 Messungen)</span>
-          </header>
-          <div class="chart chart--trend" id="performance-trend"></div>
-        </article>
-      </section>
-    </template>
-
-    <template id="athletes-template">
-      <section class="panel-grid">
-        <article class="panel">
-          <header class="panel__header">
-            <h1>Athleten</h1>
-            <input id="athlete-search" class="input" type="search" placeholder="Namen suchen" />
-          </header>
-          <ul class="athlete-list" id="athlete-list"></ul>
-        </article>
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h2>Profil & Verlauf</h2>
-            <span class="panel__subtitle">Persönliche Schwerpunkte & KPIs</span>
-          </header>
-          <div class="athlete-profile" id="athlete-profile"></div>
-        </article>
-      </section>
-    </template>
-
-    <template id="teams-template">
-      <section class="panel-grid">
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h1>Mannschaftsverwaltung</h1>
-            <button class="button button--secondary" id="create-team">Neue Mannschaft</button>
-          </header>
-          <div class="team-grid" id="team-grid"></div>
-        </article>
-        <article class="panel">
-          <header class="panel__header">
-            <h2>Staff & Verantwortlichkeiten</h2>
-          </header>
-          <div class="staff-list" id="staff-list"></div>
-        </article>
-      </section>
-    </template>
-
-    <template id="reports-template">
-      <section class="panel-grid">
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h1>Report Center</h1>
-          </header>
-          <div class="report-builder" id="report-builder"></div>
-        </article>
-        <article class="panel">
-          <header class="panel__header">
-            <h2>Geplante Reports</h2>
-          </header>
-          <ul class="report-list" id="scheduled-reports"></ul>
-        </article>
-      </section>
-    </template>
-
-    <template id="settings-template">
-      <section class="panel-grid">
-        <article class="panel panel--wide">
-          <header class="panel__header">
-            <h1>Einstellungen</h1>
-          </header>
-          <form class="settings-form" id="settings-form">
-            <fieldset>
-              <legend>Benachrichtigungen</legend>
-              <label class="toggle">
-                <input type="checkbox" name="emailAlerts" checked />
-                <span>E-Mail Erinnerungen an Trainer:innen</span>
-              </label>
-              <label class="toggle">
-                <input type="checkbox" name="athletePortal" checked />
-                <span>Athletenportal freischalten</span>
-              </label>
-            </fieldset>
-
-            <fieldset>
-              <legend>Datenschutz & Compliance</legend>
-              <label class="toggle">
-                <input type="checkbox" name="anonymize" />
-                <span>Leistungsdaten für Reports anonymisieren</span>
-              </label>
-              <label class="toggle">
-                <input type="checkbox" name="gdpr" checked />
-                <span>Datenschutzhinweise akzeptiert</span>
-              </label>
-            </fieldset>
-
-            <fieldset>
-              <legend>Integrationen</legend>
-              <label class="toggle">
-                <input type="checkbox" name="wearables" />
-                <span>Wearable-Schnittstelle aktivieren</span>
-              </label>
-              <label class="toggle">
-                <input type="checkbox" name="calendarSync" checked />
-                <span>Kalendersynchronisation aktiv</span>
-              </label>
-            </fieldset>
-
-            <div class="form-actions">
-              <button class="button button--ghost" type="reset">Zurücksetzen</button>
-              <button class="button button--primary" type="submit">Änderungen speichern</button>
-            </div>
-          </form>
-        </article>
-      </section>
-    </template>
+    </noscript>
+    <div id="app-root" class="min-h-screen"></div>
+    <div id="overlay-root"></div>
+    <script type="module" src="/src/scripts/app.js"></script>
   </body>
 </html>

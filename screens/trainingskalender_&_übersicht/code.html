@@ -1,196 +1,140 @@
 <!DOCTYPE html>
-<html class="dark" lang="de"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SwimTrack - Trainingsübersicht</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-<script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101922",
-                        "card-dark": "#18232e",
-                    },
-                    fontFamily: {
-                        "display": ["Lexend", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "0.75rem",
-                        "xl": "1rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings:
-                'FILL' 0,
-                'wght' 400,
-                'GRAD' 0,
-                'opsz' 24
-        }
-    </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display text-zinc-900 dark:text-zinc-100">
-<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-<div class="layout-container flex h-full grow flex-col">
-<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-zinc-200 dark:border-white/10 px-4 sm:px-10 py-3 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-50">
-<div class="flex items-center gap-4 text-black dark:text-white">
-<div class="size-6">
-<svg fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_6_543)">
-<path d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z"></path>
-<path clip-rule="evenodd" d="M7.24189 26.4066C7.31369 26.4411 7.64204 26.5637 8.52504 26.3738C9.59462 26.1438 11.0343 25.5311 12.7183 24.4963C14.7583 23.2426 17.0256 21.4503 19.238 19.238C21.4503 17.0256 23.2426 14.7583 24.4963 12.7183C25.5311 11.0343 26.1438 9.59463 26.3738 8.52504C26.5637 7.64204 26.4411 7.31369 26.4066 7.24189C26.345 7.21246 26.143 7.14535 25.6664 7.1918C24.9745 7.25925 23.9954 7.5498 22.7699 8.14278C20.3369 9.32007 17.3369 11.4915 14.4142 14.4142C11.4915 17.3369 9.32007 20.3369 8.14278 22.7699C7.5498 23.9954 7.25925 24.9745 7.1918 25.6664C7.14534 26.143 7.21246 26.345 7.24189 26.4066ZM29.9001 10.7285C29.4519 12.0322 28.7617 13.4172 27.9042 14.8126C26.465 17.1544 24.4686 19.6641 22.0664 22.0664C19.6641 24.4686 17.1544 26.465 14.8126 27.9042C13.4172 28.7617 12.0322 29.4519 10.7285 29.9001L21.5754 40.747C21.6001 40.7606 21.8995 40.931 22.8729 40.7217C23.9424 40.4916 25.3821 39.879 27.0661 38.8441C29.1062 37.5904 31.3734 35.7982 33.5858 33.5858C35.7982 31.3734 37.5904 29.1062 38.8441 27.0661C39.879 25.3821 40.4916 23.9425 40.7216 22.8729C40.931 21.8995 40.7606 21.6001 40.747 21.5754L29.9001 10.7285ZM29.2403 4.41187L43.5881 18.7597C44.9757 20.1473 44.9743 22.1235 44.6322 23.7139C44.2714 25.3919 43.4158 27.2666 42.252 29.1604C40.8128 31.5022 38.8165 34.012 36.4142 36.4142C34.012 38.8165 31.5022 40.8128 29.1604 42.252C27.2666 43.4158 25.3919 44.2714 23.7139 44.6322C22.1235 44.9743 20.1473 44.9757 18.7597 43.5881L4.41187 29.2403C3.29027 28.1187 3.08209 26.5973 3.21067 25.2783C3.34099 23.9415 3.8369 22.4852 4.54214 21.0277C5.96129 18.0948 8.43335 14.7382 11.5858 11.5858C14.7382 8.43335 18.0948 5.9613 21.0277 4.54214C22.4852 3.8369 23.9415 3.34099 25.2783 3.21067C26.5973 3.08209 28.1187 3.29028 29.2403 4.41187Z" fill-rule="evenodd"></path>
-</g>
-<defs>
-<clipPath id="clip0_6_543">
-<rect fill="white" height="48" width="48"></rect>
-</clipPath>
-</defs>
-</svg>
-</div>
-<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">SwimTrack</h2>
-</div>
-<div class="hidden md:flex flex-1 justify-end items-center gap-8">
-<nav class="flex items-center gap-9">
-<a class="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
-<a class="text-black dark:text-white text-sm font-bold leading-normal" href="#">Trainingsübersicht</a>
-<a class="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Athleten</a>
-<a class="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Berichte</a>
-</nav>
-<div class="flex items-center gap-2">
-<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-300 transition-colors">
-<span class="material-symbols-outlined text-xl">notifications</span>
-</button>
-<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-300 transition-colors">
-<span class="material-symbols-outlined text-xl">settings</span>
-</button>
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA1Jy8T580dXHWwDYZQP1KOyAIaqwQuJnhxD7Ns04htm_ssqkUdVViFK9FOj6LQygbvg7Ypxk5FRWxbZApKy2nKMTKgST25TdncnUuOGilwiN7MAjZiC_3KZ-ZyjQlgTWt380vBKuhQBcnkb3kcArLDFFUAhE5k0-opa8zObaVKhqozcnHKmPxyQnm6aRuV39lhA-E3rr7f3wnUReJIrR097wJ6ZyF4sm2vB74X452BZ9WT8PL4I6_BpjewuEzXGCHLvmWQk9GqHYk");'></div>
-</div>
-</div>
-<button class="md:hidden flex items-center justify-center rounded-lg h-10 w-10 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-200">
-<span class="material-symbols-outlined">menu</span>
-</button>
-</header>
-<div class="px-4 sm:px-10 flex flex-1 justify-center py-8">
-<div class="layout-content-container flex flex-col w-full max-w-7xl flex-1">
-<div class="flex flex-col sm:flex-row flex-wrap justify-between items-start gap-4 mb-6">
-<div class="flex flex-col gap-1">
-<h1 class="text-black dark:text-white text-3xl font-bold leading-tight tracking-[-0.03em]">Wann wurde was trainiert?</h1>
-</div>
-<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2 transition-colors shadow-sm">
-<span class="material-symbols-outlined text-lg">add</span>
-<span class="truncate">Neue Einheit anlegen</span>
-</button>
-</div>
-<div class="flex flex-col sm:flex-row flex-wrap items-center gap-4 py-4 border-y border-zinc-200 dark:border-white/10 mb-6">
-<div class="flex gap-2 items-center flex-wrap">
-<button class="flex items-center gap-2 rounded-lg py-1.5 px-3 bg-white dark:bg-card-dark hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/10 transition-colors text-zinc-700 dark:text-zinc-300 text-sm font-medium"><span>Mannschaft</span><span class="material-symbols-outlined text-base">expand_more</span></button>
-<button class="flex items-center gap-2 rounded-lg py-1.5 px-3 bg-white dark:bg-card-dark hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/10 transition-colors text-zinc-700 dark:text-zinc-300 text-sm font-medium"><span>Trainer</span><span class="material-symbols-outlined text-base">expand_more</span></button>
-<button class="flex items-center gap-2 rounded-lg py-1.5 px-3 bg-white dark:bg-card-dark hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/10 transition-colors text-zinc-700 dark:text-zinc-300 text-sm font-medium"><span>Ort</span><span class="material-symbols-outlined text-base">expand_more</span></button>
-<button class="flex items-center gap-2 rounded-lg py-1.5 px-3 bg-white dark:bg-card-dark hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/10 transition-colors text-zinc-700 dark:text-zinc-300 text-sm font-medium"><span>Status</span><span class="material-symbols-outlined text-base">expand_more</span></button>
-<button class="flex items-center gap-2 rounded-lg py-1.5 px-3 bg-white dark:bg-card-dark hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/10 transition-colors text-zinc-700 dark:text-zinc-300 text-sm font-medium"><span>Zeitraum</span><span class="material-symbols-outlined text-base">expand_more</span></button>
-</div>
-<div class="flex-1"></div>
-<div class="flex items-center gap-1 bg-zinc-100 dark:bg-card-dark p-1 rounded-lg">
-<button class="px-3 py-1 rounded-md bg-primary text-white text-sm font-medium"><span class="hidden sm:inline">Monat</span><span class="material-symbols-outlined sm:hidden text-2xl !leading-none">calendar_month</span></button>
-<button class="px-3 py-1 rounded-md text-zinc-500 dark:text-zinc-400 hover:bg-white dark:hover:bg-background-dark/80 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors text-sm font-medium"><span class="hidden sm:inline">Woche</span><span class="material-symbols-outlined sm:hidden text-2xl !leading-none">calendar_view_week</span></button>
-</div>
-</div>
-<main class="flex-1">
-<div class="bg-white dark:bg-card-dark rounded-xl border border-zinc-200 dark:border-white/10 shadow-sm">
-<div class="flex items-center justify-between p-4">
-<button class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-500 dark:text-zinc-400 transition-colors">
-<span class="material-symbols-outlined">chevron_left</span>
-</button>
-<p class="text-black dark:text-white text-lg font-bold leading-tight text-center">Oktober 2023</p>
-<button class="flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-500 dark:text-zinc-400 transition-colors">
-<span class="material-symbols-outlined">chevron_right</span>
-</button>
-</div>
-<div class="grid grid-cols-7 border-t border-zinc-200 dark:border-white/10">
-<p class="text-zinc-500 dark:text-zinc-400 text-xs font-bold leading-normal uppercase tracking-wider text-center h-10 flex items-center justify-center">So</p>
-<p class="text-zinc-500 dark:text-zinc-400 text-xs font-bold leading-normal uppercase tracking-wider text-center h-10 flex items-center justify-center">Mo</p>
-<p class="text-zinc-500 dark:text-zinc-400 text-xs font-bold leading-normal uppercase tracking-wider text-center h-10 flex items-center justify-center">Di</p>
-<p class="text-zinc-500 dark:text-zinc-400 text-xs font-bold leading-normal uppercase tracking-wider text-center h-10 flex items-center justify-center">Mi</p>
-<p class="text-zinc-500 dark:text-zinc-400 text-xs font-bold leading-normal uppercase tracking-wider text-center h-10 flex items-center justify-center">Do</p>
-<p class="text-zinc-500 dark:text-zinc-400 text-xs font-bold leading-normal uppercase tracking-wider text-center h-10 flex items-center justify-center">Fr</p>
-<p class="text-zinc-500 dark:text-zinc-400 text-xs font-bold leading-normal uppercase tracking-wider text-center h-10 flex items-center justify-center">Sa</p>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 col-start-1 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">1</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">2</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">3</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">4</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm overflow-hidden flex flex-col"><span class="self-end mb-1">5</span>
-<div class="flex flex-col gap-1 overflow-y-auto flex-1 pr-1">
-<a class="block p-2 rounded-md bg-green-500/10 dark:bg-green-500/20 hover:shadow-lg hover:-translate-y-px transition-all" href="#">
-<p class="font-bold text-xs truncate text-green-800 dark:text-green-300">Sprint-Technik</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">07:00-09:00 (2h)</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">U16 / M. Mustermann</p>
-</a>
-</div>
-</div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">6</span></div>
-<div class="border-t border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">7</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">8</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">9</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm overflow-hidden flex flex-col"><span class="self-end mb-1">10</span>
-<div class="flex flex-col gap-1 overflow-y-auto flex-1 pr-1">
-<a class="block p-2 rounded-md bg-yellow-500/10 dark:bg-yellow-500/20 hover:shadow-lg hover:-translate-y-px transition-all" href="#">
-<p class="font-bold text-xs truncate text-yellow-800 dark:text-yellow-300">Ausdauer (GA1)</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">18:00-20:00 (2h)</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">U16 / M. Mustermann</p>
-</a>
-</div>
-</div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">11</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm bg-primary/10 flex flex-col"><span class="self-end mb-1 font-bold text-primary">12</span>
-<div class="flex flex-col gap-1 overflow-y-auto flex-1 pr-1">
-<a class="block p-2 rounded-md bg-green-500/10 dark:bg-green-500/20 hover:shadow-lg hover:-translate-y-px transition-all" href="#">
-<p class="font-bold text-xs truncate text-green-800 dark:text-green-300">Sprint-Technik</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">07:00-09:00 (2h)</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">U16 / M. Mustermann</p>
-</a>
-<a class="block p-2 rounded-md bg-red-500/10 dark:bg-red-500/20 hover:shadow-lg hover:-translate-y-px transition-all" href="#">
-<p class="font-bold text-xs truncate text-red-800 dark:text-red-300">Krafttraining</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">16:00-17:00 (1h)</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">U16 / E. Müller</p>
-</a>
-</div>
-</div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">13</span></div>
-<div class="border-t border-zinc-200 dark:border-white/10 p-2 h-48 text-black dark:text-white font-medium text-sm flex flex-col"><span class="self-end">14</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-zinc-400 dark:text-zinc-600 font-medium text-sm flex flex-col"><span class="self-end">15</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-zinc-400 dark:text-zinc-600 font-medium text-sm flex flex-col"><span class="self-end">16</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-zinc-400 dark:text-zinc-600 font-medium text-sm overflow-hidden flex flex-col"><span class="self-end mb-1">17</span>
-<div class="flex flex-col gap-1 overflow-y-auto flex-1 pr-1">
-<a class="block p-2 rounded-md bg-red-500/10 dark:bg-red-500/20 hover:shadow-lg hover:-translate-y-px transition-all" href="#">
-<p class="font-bold text-xs truncate text-red-800 dark:text-red-300">Ausdauer (GA2)</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">18:00-20:00 (2h)</p>
-<p class="text-xs text-zinc-600 dark:text-zinc-400">U16 / M. Mustermann</p>
-</a>
-</div>
-</div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-zinc-400 dark:text-zinc-600 font-medium text-sm flex flex-col"><span class="self-end">18</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-zinc-400 dark:text-zinc-600 font-medium text-sm flex flex-col"><span class="self-end">19</span></div>
-<div class="border-t border-r border-zinc-200 dark:border-white/10 p-2 h-48 text-zinc-400 dark:text-zinc-600 font-medium text-sm flex flex-col"><span class="self-end">20</span></div>
-<div class="border-t border-zinc-200 dark:border-white/10 p-2 h-48 text-zinc-400 dark:text-zinc-600 font-medium text-sm flex flex-col"><span class="self-end">21</span></div>
-</div>
-</div>
-</main>
-</div>
-</div>
-</div>
-</div>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwimTrack – Trainingsübersicht</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    data-page="trainings"
+    class="font-display bg-background-light text-text-light-primary transition-colors duration-300 dark:bg-background-dark dark:text-text-dark-primary"
+  >
+    <div class="relative flex min-h-screen w-full flex-col">
+      <div class="flex h-full w-full" data-screen-root>
+        <aside class="flex w-64 flex-col bg-background-dark p-4 text-white">
+          <div class="flex items-center gap-3 rounded-lg p-3">
+            <div class="size-8 text-primary">
+              <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h1 class="text-xl font-bold leading-tight">SwimTrack</h1>
+          </div>
+          <nav class="mt-8 flex flex-1 flex-col justify-between" aria-label="Hauptnavigation">
+            <div class="flex flex-col gap-2" data-nav-primary>
+              <button type="button" data-route="dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></button>
+              <button type="button" data-route="trainings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-white transition-colors hover:bg-white/10"><span class="material-symbols-outlined">calendar_month</span><span>Trainingsplanung</span></button>
+              <button type="button" data-route="athletes" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">groups</span><span>Athleten</span></button>
+              <button type="button" data-route="performance" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">monitoring</span><span>Leistungsdaten</span></button>
+              <button type="button" data-route="reports" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">bar_chart</span><span>Reports &amp; Export</span></button>
+            </div>
+            <div class="flex flex-col gap-2" data-nav-secondary>
+              <button type="button" data-route="teams" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">diversity_3</span><span>Mannschaften</span></button>
+              <button type="button" data-route="settings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-text-dark-secondary transition-colors hover:bg-white/10"><span class="material-symbols-outlined">settings</span><span>Einstellungen</span></button>
+              <div class="mt-4 flex items-center gap-3 border-t border-white/10 pt-4">
+                <div
+                  class="size-10 shrink-0 rounded-full bg-cover bg-center bg-no-repeat"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuACRaMkGk88fACEIyNhdOUQnsl1VyAenm4mnjdlxO3SlSBs-hldGWQkSUdrpZaGhaonSCDHsy8vSwdlCqb_3k2hTNpxpGgE5OfPnRgYHC1u7gOqE55U-kk-Bc99in9p_p32KXwPxTN8z6C5C23xkv_2TGqKNm0FHrpGhwK8RfekaA_VkqJKsWnimeYpNKG-he7d3h2o02S2YMzPrye5d8Et2WIW2P3giodOphaG9grOI6iPxCLhjOt9ovqSF3MY7Iyoxy0TED0k1Pc");'
+                ></div>
+                <div class="flex flex-col overflow-hidden">
+                  <p class="truncate text-base font-semibold leading-tight">Max Mustermann</p>
+                  <p class="truncate text-sm text-text-dark-secondary">Cheftrainer</p>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </aside>
+        <main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark" data-screen-content>
+          <header class="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-border-light bg-background-light/80 px-10 backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/80">
+            <div class="flex min-w-72 flex-col gap-1">
+              <p class="text-2xl font-bold leading-tight tracking-tight">Trainingsübersicht</p>
+              <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Planung &amp; Dokumentation im Griff</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="button" class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90" data-action="create-session">
+                <span class="material-symbols-outlined text-base">add</span>
+                <span>Neue Einheit</span>
+              </button>
+            </div>
+          </header>
+          <div class="space-y-6 p-6 lg:p-10">
+            <section class="grid gap-6 xl:grid-cols-[1.3fr_1fr]">
+              <article class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <header class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <h2 class="text-lg font-semibold leading-tight">Kalender &amp; Filter</h2>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Wähle eine Einheit für Details</p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-3">
+                    <label class="flex items-center gap-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                      <span>Team</span>
+                      <select id="calendar-team-filter" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark"></select>
+                    </label>
+                    <label class="flex items-center gap-2 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                      <span>Ansicht</span>
+                      <select id="calendar-view" class="rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm dark:border-border-dark">
+                        <option value="list">Liste</option>
+                      </select>
+                    </label>
+                  </div>
+                </header>
+                <div id="calendar" class="mt-6 grid gap-3"></div>
+              </article>
+              <article class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <header class="flex items-center justify-between">
+                  <div>
+                    <h2 class="text-lg font-semibold leading-tight">Einheitsdetails</h2>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Überblick über Ablauf &amp; Fokus</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="rounded-full bg-card-light px-3 py-1 text-xs font-medium text-text-light-secondary ring-1 ring-border-light transition-colors hover:bg-zinc-50 dark:bg-card-dark dark:text-text-dark-secondary dark:ring-border-dark dark:hover:bg-[#2a3f53]" data-action="duplicate-session">Duplizieren</button>
+                    <button type="button" class="rounded-full bg-card-light px-3 py-1 text-xs font-medium text-text-light-secondary ring-1 ring-border-light transition-colors hover:bg-zinc-50 dark:bg-card-dark dark:text-text-dark-secondary dark:ring-border-dark dark:hover:bg-[#2a3f53]" data-action="edit-session">Bearbeiten</button>
+                  </div>
+                </header>
+                <div id="session-detail" class="mt-6 space-y-4 text-sm"></div>
+              </article>
+            </section>
 
-</body></html>
+            <section class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+              <article class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <header class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h2 class="text-lg font-semibold leading-tight">Anwesenheit dokumentieren</h2>
+                    <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Status &amp; Notizen pro Athlet:in</p>
+                  </div>
+                  <button type="button" class="flex items-center gap-2 rounded-lg bg-card-light px-4 py-2 text-sm font-medium text-text-light-secondary ring-1 ring-border-light transition-colors hover:bg-zinc-50 dark:bg-card-dark dark:text-text-dark-secondary dark:ring-border-dark dark:hover:bg-[#2a3f53]" data-action="toggle-attendance-mode">
+                    <span class="material-symbols-outlined text-base">fact_check</span>
+                    <span>Schnellerfassung</span>
+                  </button>
+                </header>
+                <div id="session-attendance" class="mt-6 space-y-4"></div>
+              </article>
+              <article class="rounded-xl border border-border-light bg-card-light p-6 dark:border-border-dark dark:bg-card-dark">
+                <h2 class="text-lg font-semibold leading-tight">Trainingsnotizen</h2>
+                <p class="text-sm text-text-light-secondary dark:text-text-dark-secondary">Gedanken zur Nachbereitung</p>
+                <textarea id="session-notes" rows="8" class="mt-4 w-full resize-none rounded-xl border border-border-light bg-transparent p-4 text-sm dark:border-border-dark" placeholder="Notizen für das Debrief"></textarea>
+                <div class="mt-4 flex items-center justify-between">
+                  <p id="session-notes-feedback" class="text-xs text-text-light-secondary dark:text-text-dark-secondary">Nicht gespeichert</p>
+                  <button type="button" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-primary/90" data-action="save-session-note">Notiz speichern</button>
+                </div>
+              </article>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
